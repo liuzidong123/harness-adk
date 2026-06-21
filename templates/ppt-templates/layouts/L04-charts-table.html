@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L04 - 双图表+表格</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">产品线对比分析</div>
+      <div class="slide-meta">数据周期：2026 Q1</div>
+    </div>
+
+    <!-- Top: Two Charts Side by Side -->
+    <div class="grid-2" style="flex:1; margin-bottom:var(--spacing-md)">
+      <!-- Chart 1: Bar Chart -->
+      <div class="card flex-col">
+        <div class="flex-between" style="margin-bottom:var(--spacing-sm)">
+          <span style="font-weight:600">各产品线营收（万元）</span>
+          <span class="tag tag-primary">Q1 实际</span>
+        </div>
+        <div style="flex:1; display:flex; align-items:flex-end; gap:20px; padding:var(--spacing-md) var(--spacing-lg)">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px">
+            <span class="text-caption text-accent">2,340</span>
+            <div style="width:100%; background:var(--color-primary); height:85%; border-radius:4px 4px 0 0"></div>
+            <span class="text-caption">产品A</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px">
+            <span class="text-caption text-blue">1,860</span>
+            <div style="width:100%; background:var(--color-secondary); height:67%; border-radius:4px 4px 0 0"></div>
+            <span class="text-caption">产品B</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px">
+            <span class="text-caption text-purple">1,420</span>
+            <div style="width:100%; background:var(--color-tertiary); height:52%; border-radius:4px 4px 0 0"></div>
+            <span class="text-caption">产品C</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px">
+            <span class="text-caption text-gold">980</span>
+            <div style="width:100%; background:var(--color-quaternary); height:36%; border-radius:4px 4px 0 0"></div>
+            <span class="text-caption">产品D</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px">
+            <span class="text-caption" style="color:var(--color-positive)">760</span>
+            <div style="width:100%; background:var(--color-positive); height:28%; border-radius:4px 4px 0 0"></div>
+            <span class="text-caption">产品E</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart 2: Stacked/Grouped -->
+      <div class="card flex-col">
+        <div class="flex-between" style="margin-bottom:var(--spacing-sm)">
+          <span style="font-weight:600">目标达成率</span>
+          <div class="flex gap-xs">
+            <span class="tag tag-positive">达标</span>
+            <span class="tag tag-negative">未达标</span>
+          </div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:var(--spacing-sm); padding:var(--spacing-sm)">
+          <div>
+            <div class="flex-between text-small" style="margin-bottom:4px"><span>产品A</span><span class="text-positive">112%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:112%; max-width:100%; background:var(--color-positive)"></div></div>
+          </div>
+          <div>
+            <div class="flex-between text-small" style="margin-bottom:4px"><span>产品B</span><span class="text-positive">104%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--color-positive)"></div></div>
+          </div>
+          <div>
+            <div class="flex-between text-small" style="margin-bottom:4px"><span>产品C</span><span class="text-negative">87%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:87%; background:var(--color-negative)"></div></div>
+          </div>
+          <div>
+            <div class="flex-between text-small" style="margin-bottom:4px"><span>产品D</span><span class="text-positive">98%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:98%; background:var(--color-quaternary)"></div></div>
+          </div>
+          <div>
+            <div class="flex-between text-small" style="margin-bottom:4px"><span>产品E</span><span class="text-negative">76%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:76%; background:var(--color-negative)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Data Table -->
+    <div class="card" style="padding:var(--spacing-sm) var(--spacing-md)">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>产品线</th>
+            <th>Q1 营收</th>
+            <th>Q1 目标</th>
+            <th>达成率</th>
+            <th>环比</th>
+            <th>同比</th>
+            <th>毛利率</th>
+            <th>客户数</th>
+            <th>续约率</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600">产品A</td>
+            <td>¥2,340万</td>
+            <td>¥2,090万</td>
+            <td class="text-positive">112%</td>
+            <td class="text-positive">+18%</td>
+            <td class="text-positive">+34%</td>
+            <td>72%</td>
+            <td>186</td>
+            <td>96%</td>
+            <td><span class="tag tag-positive">超额</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">产品B</td>
+            <td>¥1,860万</td>
+            <td>¥1,790万</td>
+            <td class="text-positive">104%</td>
+            <td class="text-positive">+8%</td>
+            <td class="text-positive">+21%</td>
+            <td>68%</td>
+            <td>342</td>
+            <td>91%</td>
+            <td><span class="tag tag-positive">达标</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">产品C</td>
+            <td>¥1,420万</td>
+            <td>¥1,630万</td>
+            <td class="text-negative">87%</td>
+            <td class="text-negative">-3%</td>
+            <td class="text-positive">+12%</td>
+            <td>65%</td>
+            <td>128</td>
+            <td>88%</td>
+            <td><span class="tag tag-negative">未达标</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">产品D</td>
+            <td>¥980万</td>
+            <td>¥1,000万</td>
+            <td style="color:var(--color-quaternary)">98%</td>
+            <td class="text-positive">+5%</td>
+            <td class="text-positive">+15%</td>
+            <td>58%</td>
+            <td>95</td>
+            <td>93%</td>
+            <td><span class="tag tag-secondary">接近</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">产品E</td>
+            <td>¥760万</td>
+            <td>¥1,000万</td>
+            <td class="text-negative">76%</td>
+            <td class="text-negative">-12%</td>
+            <td class="text-negative">-5%</td>
+            <td>45%</td>
+            <td>67</td>
+            <td>79%</td>
+            <td><span class="tag tag-negative">预警</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

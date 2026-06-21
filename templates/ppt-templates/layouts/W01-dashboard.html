@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>W01 - 数据仪表盘</title>
+  <link rel="stylesheet" href="../../ppt-light.css">
+</head>
+<body>
+<div class="slide">
+  <!-- Header -->
+  <div class="slide-header">
+    <div class="slide-title">2024年度经营数据总览</div>
+    <div class="slide-meta">数据更新: 2024-12-31 | 财务部</div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="grid-4" style="margin-bottom: var(--spacing-lg);">
+    <div class="stat-card">
+      <div class="stat-label">年度营收</div>
+      <div class="stat-value">¥12.8<span style="font-size:16px;color:var(--text-muted);">亿</span></div>
+      <div class="flex-between">
+        <div class="stat-trend up">▲ 23.5% YoY</div>
+        <div class="mini-sparkline">
+          <svg viewBox="0 0 80 24"><polyline class="spark-line" points="0,20 12,16 24,18 36,12 48,14 60,8 72,6 80,4"/><polygon class="spark-area" points="0,20 12,16 24,18 36,12 48,14 60,8 72,6 80,4 80,24 0,24"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">活跃用户</div>
+      <div class="stat-value">486<span style="font-size:16px;color:var(--text-muted);">万</span></div>
+      <div class="flex-between">
+        <div class="stat-trend up">▲ 18.2% YoY</div>
+        <div class="mini-sparkline">
+          <svg viewBox="0 0 80 24"><polyline class="spark-line" points="0,18 12,15 24,16 36,10 48,12 60,7 72,5 80,3"/><polygon class="spark-area" points="0,18 12,15 24,16 36,10 48,12 60,7 72,5 80,3 80,24 0,24"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">转化率</div>
+      <div class="stat-value">6.8<span style="font-size:16px;color:var(--text-muted);">%</span></div>
+      <div class="flex-between">
+        <div class="stat-trend up">▲ 1.2pp</div>
+        <div class="mini-sparkline">
+          <svg viewBox="0 0 80 24" style="--color-primary:#078A3A"><polyline class="spark-line" points="0,20 12,18 24,15 36,16 48,12 60,10 72,8 80,6" style="stroke:var(--color-positive)"/><polygon class="spark-area" points="0,20 12,18 24,15 36,16 48,12 60,10 72,8 80,6 80,24 0,24" style="fill:var(--color-positive)"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">客单价</div>
+      <div class="stat-value">¥263</div>
+      <div class="flex-between">
+        <div class="stat-trend down">▼ 3.1% YoY</div>
+        <div class="mini-sparkline">
+          <svg viewBox="0 0 80 24"><polyline class="spark-line" points="0,8 12,10 24,9 36,12 48,14 60,16 72,15 80,18" style="stroke:var(--color-negative)"/><polygon class="spark-area" points="0,8 12,10 24,9 36,12 48,14 60,16 72,15 80,18 80,24 0,24" style="fill:var(--color-negative)"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Main Chart Area + Side Metrics -->
+  <div class="flex gap-md" style="margin-bottom: var(--spacing-lg); height: 380px;">
+    <!-- Large Bar+Line Chart -->
+    <div class="chart-card flex-1">
+      <div class="flex-between">
+        <div class="chart-title">月度营收趋势（万元）</div>
+        <div class="flex gap-sm">
+          <span class="color-tag"><span class="icon-dot"></span> 营收</span>
+          <span class="color-tag"><span class="icon-dot orange"></span> 成本</span>
+          <span class="color-tag"><span class="icon-dot green"></span> 利润率</span>
+        </div>
+      </div>
+      <div style="flex:1; display:flex; align-items:flex-end; gap:3px; padding-top:12px;">
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">1月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:65%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:45%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">2月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:58%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:42%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">3月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:72%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:48%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">4月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:68%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:44%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">5月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:75%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:46%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">6月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:82%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:50%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">7月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:78%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:48%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">8月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:85%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:52%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">9月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:80%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:49%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">10月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:88%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:53%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">11月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:92%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:55%;opacity:0.7;"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+          <span style="font-size:9px;color:var(--text-muted);">12月</span>
+          <div style="width:100%;display:flex;gap:1px;align-items:flex-end;height:280px;">
+            <div style="flex:1;background:var(--color-primary);border-radius:2px 2px 0 0;height:95%;"></div>
+            <div style="flex:1;background:var(--color-secondary);border-radius:2px 2px 0 0;height:58%;opacity:0.7;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bottom 4 Mini Charts Grid -->
+  <div class="grid-4" style="height: 200px;">
+    <!-- Ring Chart: 目标达成率 -->
+    <div class="chart-card">
+      <div class="chart-title">年度目标达成率</div>
+      <div class="flex-center gap-md" style="flex:1;">
+        <div class="mini-ring" style="--ring-pct:87;width:64px;height:64px;">
+          <span class="ring-value" style="font-size:13px;">87%</span>
+        </div>
+        <div class="flex-col gap-xs">
+          <div style="font-size:11px;color:var(--text-muted);">目标: ¥14.7亿</div>
+          <div style="font-size:11px;color:var(--text-muted);">实际: ¥12.8亿</div>
+          <span class="tag tag-positive">达标</span>
+        </div>
+      </div>
+    </div>
+    <!-- Stacked Bar: 收入构成 -->
+    <div class="chart-card">
+      <div class="chart-title">收入构成</div>
+      <div class="flex-col gap-xs" style="flex:1;justify-content:center;">
+        <div class="flex-between"><span style="font-size:11px;">订阅服务</span><span style="font-size:11px;font-weight:600;">52%</span></div>
+        <div class="mini-progress"><div class="progress-track"><div class="progress-fill" style="width:52%;"></div></div></div>
+        <div class="flex-between"><span style="font-size:11px;">广告收入</span><span style="font-size:11px;font-weight:600;">28%</span></div>
+        <div class="mini-progress"><div class="progress-track"><div class="progress-fill" style="width:28%;background:var(--color-secondary);"></div></div></div>
+        <div class="flex-between"><span style="font-size:11px;">增值服务</span><span style="font-size:11px;font-weight:600;">13%</span></div>
+        <div class="mini-progress"><div class="progress-track"><div class="progress-fill" style="width:13%;background:var(--color-positive);"></div></div></div>
+        <div class="flex-between"><span style="font-size:11px;">其他</span><span style="font-size:11px;font-weight:600;">7%</span></div>
+        <div class="mini-progress"><div class="progress-track"><div class="progress-fill" style="width:7%;background:var(--color-tertiary);"></div></div></div>
+      </div>
+    </div>
+    <!-- Mini Bar: 区域分布 -->
+    <div class="chart-card">
+      <div class="chart-title">区域营收分布（亿元）</div>
+      <div class="flex gap-xs" style="flex:1;align-items:flex-end;padding-top:8px;">
+        <div class="flex-col" style="flex:1;align-items:center;gap:2px;">
+          <span style="font-size:9px;font-weight:600;">4.2</span>
+          <div style="width:80%;height:120px;background:var(--color-primary);border-radius:3px 3px 0 0;"></div>
+          <span style="font-size:9px;color:var(--text-muted);">华东</span>
+        </div>
+        <div class="flex-col" style="flex:1;align-items:center;gap:2px;">
+          <span style="font-size:9px;font-weight:600;">3.1</span>
+          <div style="width:80%;height:89px;background:var(--color-primary);border-radius:3px 3px 0 0;opacity:0.8;"></div>
+          <span style="font-size:9px;color:var(--text-muted);">华南</span>
+        </div>
+        <div class="flex-col" style="flex:1;align-items:center;gap:2px;">
+          <span style="font-size:9px;font-weight:600;">2.6</span>
+          <div style="width:80%;height:74px;background:var(--color-primary);border-radius:3px 3px 0 0;opacity:0.6;"></div>
+          <span style="font-size:9px;color:var(--text-muted);">华北</span>
+        </div>
+        <div class="flex-col" style="flex:1;align-items:center;gap:2px;">
+          <span style="font-size:9px;font-weight:600;">1.8</span>
+          <div style="width:80%;height:51px;background:var(--color-secondary);border-radius:3px 3px 0 0;"></div>
+          <span style="font-size:9px;color:var(--text-muted);">西部</span>
+        </div>
+        <div class="flex-col" style="flex:1;align-items:center;gap:2px;">
+          <span style="font-size:9px;font-weight:600;">1.1</span>
+          <div style="width:80%;height:31px;background:var(--color-secondary);border-radius:3px 3px 0 0;opacity:0.7;"></div>
+          <span style="font-size:9px;color:var(--text-muted);">海外</span>
+        </div>
+      </div>
+    </div>
+    <!-- Heat Blocks: 产品线健康度 -->
+    <div class="chart-card">
+      <div class="chart-title">产品线健康度</div>
+      <div class="flex-col gap-xs" style="flex:1;justify-content:center;">
+        <div class="flex gap-xs">
+          <div style="flex:1;height:28px;background:var(--color-positive);border-radius:3px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:600;">A+ 核心平台</div>
+          <div style="flex:1;height:28px;background:var(--color-positive);border-radius:3px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:600;opacity:0.8;">A 支付</div>
+        </div>
+        <div class="flex gap-xs">
+          <div style="flex:1;height:28px;background:var(--color-primary);border-radius:3px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:600;">B+ 电商</div>
+          <div style="flex:1;height:28px;background:var(--color-primary);border-radius:3px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:600;opacity:0.7;">B 云服务</div>
+        </div>
+        <div class="flex gap-xs">
+          <div style="flex:1;height:28px;background:var(--color-secondary);border-radius:3px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:600;">C+ 社交</div>
+          <div style="flex:1;height:28px;background:var(--color-negative);border-radius:3px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:600;opacity:0.8;">C 游戏</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L03 - 多指标仪表盘</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">业务仪表盘</div>
+      <div class="slide-meta">实时数据 · 截至 2026-03-31</div>
+    </div>
+
+    <!-- Top: KPI Row -->
+    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:var(--spacing-sm); margin-bottom:var(--spacing-lg)">
+      <div class="kpi-card" style="padding:var(--spacing-sm)">
+        <div class="kpi-label">日活用户</div>
+        <div class="kpi-value" style="font-size:24px">328K</div>
+        <div class="kpi-trend up">↑ 5.2%</div>
+      </div>
+      <div class="kpi-card" style="padding:var(--spacing-sm)">
+        <div class="kpi-label">转化率</div>
+        <div class="kpi-value" style="font-size:24px">3.8%</div>
+        <div class="kpi-trend up">↑ 0.4pp</div>
+      </div>
+      <div class="kpi-card" style="padding:var(--spacing-sm)">
+        <div class="kpi-label">ARPU</div>
+        <div class="kpi-value" style="font-size:24px">¥127</div>
+        <div class="kpi-trend up">↑ 8%</div>
+      </div>
+      <div class="kpi-card" style="padding:var(--spacing-sm)">
+        <div class="kpi-label">退款率</div>
+        <div class="kpi-value" style="font-size:24px">1.2%</div>
+        <div class="kpi-trend down">↑ 0.3pp</div>
+      </div>
+      <div class="kpi-card" style="padding:var(--spacing-sm)">
+        <div class="kpi-label">服务可用性</div>
+        <div class="kpi-value" style="font-size:24px">99.97%</div>
+        <div class="kpi-trend up">稳定</div>
+      </div>
+      <div class="kpi-card" style="padding:var(--spacing-sm)">
+        <div class="kpi-label">P0 故障</div>
+        <div class="kpi-value" style="font-size:24px">0</div>
+        <div class="kpi-trend up">本月无</div>
+      </div>
+    </div>
+
+    <!-- Middle: Main Chart Area -->
+    <div style="flex:1; display:grid; grid-template-columns:2fr 1fr; gap:var(--spacing-md); margin-bottom:var(--spacing-lg)">
+      <!-- Primary Chart -->
+      <div class="chart-area flex-col" style="align-items:stretch">
+        <div class="flex-between" style="margin-bottom:var(--spacing-sm)">
+          <span class="text-subtitle">月度营收趋势</span>
+          <div class="flex gap-sm">
+            <span class="tag tag-primary">本年</span>
+            <span class="tag tag-secondary">去年</span>
+          </div>
+        </div>
+        <div style="flex:1; display:flex; align-items:flex-end; gap:12px; padding:var(--spacing-md) 0">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px">
+            <div style="width:100%; background:var(--color-secondary); opacity:0.4; height:45%; border-radius:3px 3px 0 0"></div>
+            <div style="width:100%; background:var(--color-primary); height:52%; border-radius:3px 3px 0 0; margin-top:-45%"></div>
+            <span class="text-caption">1月</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px">
+            <div style="width:100%; background:var(--color-secondary); opacity:0.4; height:48%; border-radius:3px 3px 0 0"></div>
+            <div style="width:100%; background:var(--color-primary); height:58%; border-radius:3px 3px 0 0; margin-top:-48%"></div>
+            <span class="text-caption">2月</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px">
+            <div style="width:100%; background:var(--color-secondary); opacity:0.4; height:52%; border-radius:3px 3px 0 0"></div>
+            <div style="width:100%; background:var(--color-primary); height:68%; border-radius:3px 3px 0 0; margin-top:-52%"></div>
+            <span class="text-caption">3月</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px">
+            <div style="width:100%; background:var(--bg-elevated); height:75%; border-radius:3px 3px 0 0; border:1px dashed var(--border-color)"></div>
+            <span class="text-caption">4月</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px">
+            <div style="width:100%; background:var(--bg-elevated); height:80%; border-radius:3px 3px 0 0; border:1px dashed var(--border-color)"></div>
+            <span class="text-caption">5月</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px">
+            <div style="width:100%; background:var(--bg-elevated); height:85%; border-radius:3px 3px 0 0; border:1px dashed var(--border-color)"></div>
+            <span class="text-caption">6月</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Chart -->
+      <div class="card flex-col">
+        <div class="text-subtitle" style="margin-bottom:var(--spacing-sm)">渠道占比</div>
+        <div style="flex:1; display:flex; align-items:center; justify-content:center">
+          <div style="width:180px; height:180px; border-radius:50%; background:conic-gradient(var(--color-primary) 0% 42%, var(--color-secondary) 42% 68%, var(--color-tertiary) 68% 85%, var(--color-quaternary) 85% 100%); position:relative">
+            <div style="position:absolute; inset:40px; border-radius:50%; background:var(--bg-card)"></div>
+          </div>
+        </div>
+        <div class="flex-col gap-xs" style="font-size:var(--font-small)">
+          <div class="flex-between"><span><span style="color:var(--color-primary)">●</span> 直销</span><span>42%</span></div>
+          <div class="flex-between"><span><span style="color:var(--color-secondary)">●</span> 渠道</span><span>26%</span></div>
+          <div class="flex-between"><span><span style="color:var(--color-tertiary)">●</span> 线上</span><span>17%</span></div>
+          <div class="flex-between"><span><span style="color:var(--color-quaternary)">●</span> 其他</span><span>15%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Mini Trend Row -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:var(--spacing-sm)">
+      <div class="card" style="padding:var(--spacing-xs) var(--spacing-sm)">
+        <div class="flex-between" style="margin-bottom:4px">
+          <span class="text-caption">注册转化</span>
+          <span class="text-small text-positive">+12%</span>
+        </div>
+        <div class="mini-chart"></div>
+      </div>
+      <div class="card" style="padding:var(--spacing-xs) var(--spacing-sm)">
+        <div class="flex-between" style="margin-bottom:4px">
+          <span class="text-caption">付费转化</span>
+          <span class="text-small text-positive">+5%</span>
+        </div>
+        <div class="mini-chart"></div>
+      </div>
+      <div class="card" style="padding:var(--spacing-xs) var(--spacing-sm)">
+        <div class="flex-between" style="margin-bottom:4px">
+          <span class="text-caption">客单价</span>
+          <span class="text-small text-positive">+8%</span>
+        </div>
+        <div class="mini-chart"></div>
+      </div>
+      <div class="card" style="padding:var(--spacing-xs) var(--spacing-sm)">
+        <div class="flex-between" style="margin-bottom:4px">
+          <span class="text-caption">流失率</span>
+          <span class="text-small text-negative">+0.3pp</span>
+        </div>
+        <div class="mini-chart"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

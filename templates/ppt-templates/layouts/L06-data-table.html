@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L06 - 瀑布流表格</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">项目进度明细</div>
+      <div class="flex gap-sm">
+        <span class="tag tag-positive">已完成 8</span>
+        <span class="tag tag-secondary">进行中 4</span>
+        <span class="tag tag-negative">延期 2</span>
+      </div>
+    </div>
+
+    <!-- Full-page Table -->
+    <div class="card" style="flex:1; padding:var(--spacing-sm) var(--spacing-md); overflow:hidden">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th style="width:200px">项目名称</th>
+            <th>负责人</th>
+            <th>优先级</th>
+            <th>开始日期</th>
+            <th>截止日期</th>
+            <th style="width:160px">进度</th>
+            <th>工时(h)</th>
+            <th>预算消耗</th>
+            <th>风险</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td style="font-weight:600">用户认证系统重构</td>
+            <td>张明</td>
+            <td><span class="tag tag-negative">P0</span></td>
+            <td>01-15</td>
+            <td>03-01</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--color-positive)"></div></div></td>
+            <td>320/300</td>
+            <td>107%</td>
+            <td class="text-secondary">—</td>
+            <td><span class="tag tag-positive">已完成</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td style="font-weight:600">支付网关升级</td>
+            <td>李华</td>
+            <td><span class="tag tag-negative">P0</span></td>
+            <td>02-01</td>
+            <td>03-15</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--color-positive)"></div></div></td>
+            <td>240/250</td>
+            <td>96%</td>
+            <td class="text-secondary">—</td>
+            <td><span class="tag tag-positive">已完成</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td style="font-weight:600">数据看板 V2</td>
+            <td>王芳</td>
+            <td><span class="tag tag-primary">P1</span></td>
+            <td>02-10</td>
+            <td>03-20</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--color-positive)"></div></div></td>
+            <td>180/200</td>
+            <td>90%</td>
+            <td class="text-secondary">—</td>
+            <td><span class="tag tag-positive">已完成</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td style="font-weight:600">移动端性能优化</td>
+            <td>赵强</td>
+            <td><span class="tag tag-primary">P1</span></td>
+            <td>02-15</td>
+            <td>03-31</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:85%; background:var(--color-secondary)"></div></div></td>
+            <td>136/160</td>
+            <td>78%</td>
+            <td><span class="tag tag-secondary">中</span></td>
+            <td><span class="tag tag-secondary">进行中</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td style="font-weight:600">AI 推荐引擎 POC</td>
+            <td>陈伟</td>
+            <td><span class="tag tag-primary">P1</span></td>
+            <td>03-01</td>
+            <td>04-15</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:60%; background:var(--color-secondary)"></div></div></td>
+            <td>96/160</td>
+            <td>55%</td>
+            <td><span class="tag tag-secondary">中</span></td>
+            <td><span class="tag tag-secondary">进行中</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td style="font-weight:600">多租户架构改造</td>
+            <td>张明</td>
+            <td><span class="tag tag-negative">P0</span></td>
+            <td>03-01</td>
+            <td>04-30</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:40%; background:var(--color-secondary)"></div></div></td>
+            <td>128/320</td>
+            <td>35%</td>
+            <td><span class="tag tag-negative">高</span></td>
+            <td><span class="tag tag-secondary">进行中</span></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td style="font-weight:600">国际化 i18n 框架</td>
+            <td>刘洋</td>
+            <td><span class="tag tag-secondary">P2</span></td>
+            <td>02-20</td>
+            <td>03-25</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:70%; background:var(--color-negative)"></div></div></td>
+            <td>112/120</td>
+            <td>93%</td>
+            <td><span class="tag tag-negative">高</span></td>
+            <td><span class="tag tag-negative">延期</span></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td style="font-weight:600">自动化测试覆盖</td>
+            <td>周静</td>
+            <td><span class="tag tag-secondary">P2</span></td>
+            <td>01-20</td>
+            <td>03-10</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--color-positive)"></div></div></td>
+            <td>200/200</td>
+            <td>100%</td>
+            <td class="text-secondary">—</td>
+            <td><span class="tag tag-positive">已完成</span></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td style="font-weight:600">日志聚合平台</td>
+            <td>吴磊</td>
+            <td><span class="tag tag-secondary">P2</span></td>
+            <td>02-01</td>
+            <td>03-15</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:100%; background:var(--color-positive)"></div></div></td>
+            <td>150/160</td>
+            <td>94%</td>
+            <td class="text-secondary">—</td>
+            <td><span class="tag tag-positive">已完成</span></td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td style="font-weight:600">客户门户改版</td>
+            <td>王芳</td>
+            <td><span class="tag tag-primary">P1</span></td>
+            <td>03-10</td>
+            <td>04-20</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:25%; background:var(--color-secondary)"></div></div></td>
+            <td>40/160</td>
+            <td>22%</td>
+            <td><span class="tag tag-secondary">中</span></td>
+            <td><span class="tag tag-secondary">进行中</span></td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td style="font-weight:600">API 网关迁移</td>
+            <td>李华</td>
+            <td><span class="tag tag-primary">P1</span></td>
+            <td>02-25</td>
+            <td>03-20</td>
+            <td><div class="progress-bar"><div class="progress-fill" style="width:55%; background:var(--color-negative)"></div></div></td>
+            <td>88/120</td>
+            <td>85%</td>
+            <td><span class="tag tag-negative">高</span></td>
+            <td><span class="tag tag-negative">延期</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

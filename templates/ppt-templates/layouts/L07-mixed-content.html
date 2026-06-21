@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L07 - 图文混排密集</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">技术架构升级要点</div>
+      <div class="slide-meta">2026 Q2 技术规划</div>
+    </div>
+
+    <!-- Main: Left Points + Right Chart -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--spacing-lg); flex:1">
+
+      <!-- Left: Dense Point List -->
+      <div class="flex-col gap-xs">
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-primary)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">1. 微服务拆分完成度 85%</span>
+            <span class="tag tag-positive">进行中</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">剩余 3 个单体模块待拆分，预计 4 月中完成</div>
+        </div>
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-secondary)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">2. K8s 集群迁移至 ARM 架构</span>
+            <span class="tag tag-secondary">规划中</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">预期降低 35% 计算成本，需验证 Java 应用兼容性</div>
+        </div>
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-positive)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">3. 数据库读写分离上线</span>
+            <span class="tag tag-positive">已完成</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">读延迟从 45ms 降至 12ms，写入吞吐提升 3x</div>
+        </div>
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-tertiary)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">4. 全链路追踪覆盖率 → 100%</span>
+            <span class="tag tag-positive">进行中</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">当前 78%，剩余异步任务和第三方调用待接入</div>
+        </div>
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-quaternary)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">5. CDN 多活部署</span>
+            <span class="tag tag-positive">已完成</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">三地域就近接入，静态资源加载 P95 从 800ms→220ms</div>
+        </div>
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-negative)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">6. 安全审计整改（高危 0 项）</span>
+            <span class="tag tag-negative">阻塞中</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">依赖第三方 SDK 升级，已推动供应商排期</div>
+        </div>
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-secondary)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">7. CI/CD 流水线优化</span>
+            <span class="tag tag-positive">已完成</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">构建时间从 12min→4min，部署频率提升至日均 8 次</div>
+        </div>
+        <div class="card" style="padding:var(--spacing-sm); border-left:3px solid var(--color-primary)">
+          <div class="flex-between">
+            <span style="font-weight:600; font-size:var(--font-small)">8. 缓存层统一（Redis Cluster）</span>
+            <span class="tag tag-secondary">规划中</span>
+          </div>
+          <div class="text-caption" style="margin-top:4px">替换 Memcached + 本地缓存混用，统一管理策略</div>
+        </div>
+      </div>
+
+      <!-- Right: Chart + Stats -->
+      <div class="flex-col gap-md">
+        <!-- Architecture Diagram Placeholder -->
+        <div class="chart-area" style="flex:2">
+          <div class="flex-col" style="align-items:center; gap:var(--spacing-sm)">
+            <div style="font-size:var(--font-subtitle); color:var(--text-secondary)">系统架构拓扑图</div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:var(--spacing-sm); width:80%">
+              <div style="background:var(--bg-elevated); border-radius:var(--radius); padding:var(--spacing-sm); text-align:center">
+                <div class="text-caption text-accent">接入层</div>
+                <div class="text-caption">Nginx + CDN</div>
+              </div>
+              <div style="background:var(--bg-elevated); border-radius:var(--radius); padding:var(--spacing-sm); text-align:center">
+                <div class="text-caption text-blue">服务层</div>
+                <div class="text-caption">K8s × 12 pods</div>
+              </div>
+              <div style="background:var(--bg-elevated); border-radius:var(--radius); padding:var(--spacing-sm); text-align:center">
+                <div class="text-caption text-purple">数据层</div>
+                <div class="text-caption">PG + Redis</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Stats -->
+        <div class="card flex-col gap-sm" style="flex:1">
+          <div style="font-weight:600; margin-bottom:4px">性能基线对比</div>
+          <div class="flex-between text-small">
+            <span>API P99 延迟</span>
+            <span><span class="text-negative" style="text-decoration:line-through">320ms</span> → <span class="text-positive">85ms</span></span>
+          </div>
+          <div class="flex-between text-small">
+            <span>数据库 QPS</span>
+            <span><span class="text-negative" style="text-decoration:line-through">2,400</span> → <span class="text-positive">8,600</span></span>
+          </div>
+          <div class="flex-between text-small">
+            <span>错误率</span>
+            <span><span class="text-negative" style="text-decoration:line-through">0.8%</span> → <span class="text-positive">0.02%</span></span>
+          </div>
+          <div class="flex-between text-small">
+            <span>部署频率</span>
+            <span><span style="text-decoration:line-through">周 2 次</span> → <span class="text-positive">日 8 次</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Notes -->
+    <div style="margin-top:var(--spacing-md); padding-top:var(--spacing-sm); border-top:1px solid var(--border-color)">
+      <div class="text-caption">备注：红色阻塞项需 Q2 第一周完成供应商协调，否则影响安全合规审计时间线。ARM 迁移 ROI 分析见附录 A。</div>
+    </div>
+  </div>
+</body>
+</html>

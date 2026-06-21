@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L09 - 时间轴+数据</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">产品迭代路线图</div>
+      <div class="slide-meta">2026 H1 里程碑</div>
+    </div>
+
+    <!-- Timeline -->
+    <div style="flex:1; display:flex; flex-direction:column">
+      <!-- Timeline Bar -->
+      <div style="position:relative; margin:var(--spacing-lg) 60px var(--spacing-md)">
+        <!-- Line -->
+        <div style="position:absolute; top:50%; left:0; right:0; height:2px; background:var(--border-color); transform:translateY(-50%)"></div>
+        <!-- Nodes -->
+        <div style="display:flex; justify-content:space-between; position:relative">
+          <div style="width:16px; height:16px; border-radius:50%; background:var(--color-positive); border:3px solid var(--bg-page)"></div>
+          <div style="width:16px; height:16px; border-radius:50%; background:var(--color-positive); border:3px solid var(--bg-page)"></div>
+          <div style="width:16px; height:16px; border-radius:50%; background:var(--color-positive); border:3px solid var(--bg-page)"></div>
+          <div style="width:16px; height:16px; border-radius:50%; background:var(--color-primary); border:3px solid var(--bg-page); box-shadow:0 0 0 3px var(--color-primary)"></div>
+          <div style="width:16px; height:16px; border-radius:50%; background:var(--bg-elevated); border:3px solid var(--border-color)"></div>
+          <div style="width:16px; height:16px; border-radius:50%; background:var(--bg-elevated); border:3px solid var(--border-color)"></div>
+        </div>
+      </div>
+
+      <!-- Month Labels -->
+      <div style="display:flex; justify-content:space-between; margin:0 52px var(--spacing-lg)">
+        <span class="text-caption" style="width:80px; text-align:center">1月</span>
+        <span class="text-caption" style="width:80px; text-align:center">2月</span>
+        <span class="text-caption" style="width:80px; text-align:center">3月</span>
+        <span class="text-caption" style="width:80px; text-align:center; color:var(--color-primary); font-weight:600">4月（当前）</span>
+        <span class="text-caption" style="width:80px; text-align:center">5月</span>
+        <span class="text-caption" style="width:80px; text-align:center">6月</span>
+      </div>
+
+      <!-- Data Cards per Node -->
+      <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:var(--spacing-sm); flex:1">
+        <!-- Jan -->
+        <div class="card flex-col gap-xs" style="padding:var(--spacing-sm)">
+          <div class="text-small" style="font-weight:600; color:var(--color-positive)">V2.1 发布</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="text-caption">用户认证重构</div>
+          <div class="text-caption">支付网关升级</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="flex-between">
+            <span class="text-caption">交付</span>
+            <span class="tag tag-positive" style="font-size:10px">100%</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">Bug</span>
+            <span class="text-caption">3 (已修)</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">用户</span>
+            <span class="text-caption">+8.2K</span>
+          </div>
+        </div>
+
+        <!-- Feb -->
+        <div class="card flex-col gap-xs" style="padding:var(--spacing-sm)">
+          <div class="text-small" style="font-weight:600; color:var(--color-positive)">V2.2 发布</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="text-caption">数据看板 V2</div>
+          <div class="text-caption">日志聚合平台</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="flex-between">
+            <span class="text-caption">交付</span>
+            <span class="tag tag-positive" style="font-size:10px">100%</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">Bug</span>
+            <span class="text-caption">7 (5修)</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">用户</span>
+            <span class="text-caption">+15.6K</span>
+          </div>
+        </div>
+
+        <!-- Mar -->
+        <div class="card flex-col gap-xs" style="padding:var(--spacing-sm)">
+          <div class="text-small" style="font-weight:600; color:var(--color-positive)">V2.3 发布</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="text-caption">性能优化包</div>
+          <div class="text-caption">CDN 多活</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="flex-between">
+            <span class="text-caption">交付</span>
+            <span class="tag tag-positive" style="font-size:10px">100%</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">P99</span>
+            <span class="text-caption">-73%</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">用户</span>
+            <span class="text-caption">+22.1K</span>
+          </div>
+        </div>
+
+        <!-- Apr (Current) -->
+        <div class="card flex-col gap-xs" style="padding:var(--spacing-sm); border:1px solid var(--color-primary)">
+          <div class="text-small" style="font-weight:600; color:var(--color-primary)">V2.4 开发中</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="text-caption">AI 推荐引擎</div>
+          <div class="text-caption">多租户架构</div>
+          <div class="text-caption">客户门户改版</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="flex-between">
+            <span class="text-caption">进度</span>
+            <span class="tag tag-primary" style="font-size:10px">45%</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">风险</span>
+            <span class="text-caption text-negative">2项</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">人力</span>
+            <span class="text-caption">12人</span>
+          </div>
+        </div>
+
+        <!-- May -->
+        <div class="card flex-col gap-xs" style="padding:var(--spacing-sm); opacity:0.7">
+          <div class="text-small" style="font-weight:600">V2.5 规划</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="text-caption">国际化 i18n</div>
+          <div class="text-caption">ARM 迁移</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="flex-between">
+            <span class="text-caption">预估</span>
+            <span class="text-caption">6 周</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">人力</span>
+            <span class="text-caption">8人</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">依赖</span>
+            <span class="text-caption">V2.4</span>
+          </div>
+        </div>
+
+        <!-- Jun -->
+        <div class="card flex-col gap-xs" style="padding:var(--spacing-sm); opacity:0.7">
+          <div class="text-small" style="font-weight:600">V3.0 规划</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="text-caption">新一代架构</div>
+          <div class="text-caption">海外市场 MVP</div>
+          <div class="divider" style="margin:4px 0"></div>
+          <div class="flex-between">
+            <span class="text-caption">预估</span>
+            <span class="text-caption">8 周</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">人力</span>
+            <span class="text-caption">15人</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-caption">预算</span>
+            <span class="text-caption">¥180万</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L11 - 漏斗/流程+指标</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">用户转化漏斗分析</div>
+      <div class="slide-meta">2026 Q1 · 全渠道汇总</div>
+    </div>
+
+    <!-- Main: Left Funnel + Right Table -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--spacing-lg); flex:1">
+
+      <!-- Left: Funnel Visualization -->
+      <div class="card flex-col" style="padding:var(--spacing-lg); justify-content:center">
+        <div class="flex-col" style="align-items:center; gap:4px">
+          <!-- Stage 1 -->
+          <div style="width:100%; background:var(--color-secondary); border-radius:var(--radius); padding:var(--spacing-sm) var(--spacing-md); text-align:center; position:relative">
+            <div class="flex-between">
+              <span style="font-weight:600; color:#1A1614">访问</span>
+              <span style="font-weight:700; color:#1A1614">1,240,000</span>
+            </div>
+          </div>
+          <div style="width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:8px solid var(--border-color)"></div>
+
+          <!-- Stage 2 -->
+          <div style="width:85%; background:var(--color-tertiary); border-radius:var(--radius); padding:var(--spacing-sm) var(--spacing-md); text-align:center">
+            <div class="flex-between">
+              <span style="font-weight:600; color:#1A1614">注册</span>
+              <span style="font-weight:700; color:#1A1614">186,000</span>
+            </div>
+          </div>
+          <div style="width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:8px solid var(--border-color)"></div>
+
+          <!-- Stage 3 -->
+          <div style="width:68%; background:var(--color-primary); border-radius:var(--radius); padding:var(--spacing-sm) var(--spacing-md); text-align:center">
+            <div class="flex-between">
+              <span style="font-weight:600; color:#1A1614">激活</span>
+              <span style="font-weight:700; color:#1A1614">89,280</span>
+            </div>
+          </div>
+          <div style="width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:8px solid var(--border-color)"></div>
+
+          <!-- Stage 4 -->
+          <div style="width:48%; background:var(--color-quaternary); border-radius:var(--radius); padding:var(--spacing-sm) var(--spacing-md); text-align:center">
+            <div class="flex-between">
+              <span style="font-weight:600; color:#1A1614">付费</span>
+              <span style="font-weight:700; color:#1A1614">37,500</span>
+            </div>
+          </div>
+          <div style="width:0; height:0; border-left:12px solid transparent; border-right:12px solid transparent; border-top:8px solid var(--border-color)"></div>
+
+          <!-- Stage 5 -->
+          <div style="width:32%; background:var(--color-positive); border-radius:var(--radius); padding:var(--spacing-sm) var(--spacing-md); text-align:center">
+            <div class="flex-between">
+              <span style="font-weight:600; color:#1A1614">续费</span>
+              <span style="font-weight:700; color:#1A1614">28,125</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall Rate -->
+        <div style="text-align:center; margin-top:var(--spacing-lg)">
+          <span class="text-caption">全链路转化率：</span>
+          <span style="font-size:var(--font-subtitle); font-weight:700; color:var(--color-primary)">2.27%</span>
+          <span class="text-caption" style="margin-left:var(--spacing-sm)">环比 <span class="text-positive">+0.3pp</span></span>
+        </div>
+      </div>
+
+      <!-- Right: Conversion Table + Insights -->
+      <div class="flex-col gap-md">
+        <!-- Conversion Rate Table -->
+        <div class="card" style="padding:var(--spacing-md)">
+          <div style="font-weight:600; margin-bottom:var(--spacing-sm)">各阶段转化率</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>阶段</th>
+                <th>转化率</th>
+                <th>环比</th>
+                <th>同比</th>
+                <th>行业均值</th>
+                <th>差距</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600">访问→注册</td>
+                <td>15.0%</td>
+                <td class="text-positive">+1.2pp</td>
+                <td class="text-positive">+3.5pp</td>
+                <td>12%</td>
+                <td class="text-positive">+3.0pp</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">注册→激活</td>
+                <td>48.0%</td>
+                <td class="text-positive">+2.8pp</td>
+                <td class="text-positive">+8.0pp</td>
+                <td>40%</td>
+                <td class="text-positive">+8.0pp</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">激活→付费</td>
+                <td>42.0%</td>
+                <td class="text-negative">-1.5pp</td>
+                <td class="text-positive">+2.0pp</td>
+                <td>35%</td>
+                <td class="text-positive">+7.0pp</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">付费→续费</td>
+                <td>75.0%</td>
+                <td class="text-negative">-3.0pp</td>
+                <td class="text-negative">-2.0pp</td>
+                <td>80%</td>
+                <td class="text-negative">-5.0pp</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Insights -->
+        <div class="card flex-col gap-sm" style="padding:var(--spacing-md); flex:1">
+          <div style="font-weight:600">关键洞察与行动项</div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex gap-sm" style="align-items:flex-start">
+            <span class="tag tag-negative" style="min-width:fit-content">瓶颈</span>
+            <div class="text-small">付费→续费转化率低于行业均值 5pp，主因：首月体验不佳导致次月流失集中</div>
+          </div>
+          <div class="flex gap-sm" style="align-items:flex-start">
+            <span class="tag tag-positive" style="min-width:fit-content">亮点</span>
+            <div class="text-small">注册→激活环节优化效果显著，新手引导改版后提升 2.8pp</div>
+          </div>
+          <div class="flex gap-sm" style="align-items:flex-start">
+            <span class="tag tag-primary" style="min-width:fit-content">行动</span>
+            <div class="text-small">Q2 重点：① 优化首月 onboarding 体验 ② 增加 Day7 触达策略 ③ 建立流失预警模型</div>
+          </div>
+          <div class="flex gap-sm" style="align-items:flex-start">
+            <span class="tag tag-secondary" style="min-width:fit-content">目标</span>
+            <div class="text-small">Q2 末续费率提升至 80%（+5pp），全链路转化率提升至 2.8%（+0.5pp）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

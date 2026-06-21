@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L10 - 对比分析</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">方案对比评估</div>
+      <div class="slide-meta">技术选型 · 数据中台架构</div>
+    </div>
+
+    <!-- Three Column: Left Option + Middle Diff + Right Option -->
+    <div style="display:grid; grid-template-columns:1fr 200px 1fr; gap:var(--spacing-md); flex:1">
+
+      <!-- Left: Option A -->
+      <div class="card flex-col" style="border-top:3px solid var(--color-secondary)">
+        <div class="flex-between" style="margin-bottom:var(--spacing-md)">
+          <span style="font-size:var(--font-subtitle); font-weight:700; color:var(--color-secondary)">方案 A：自建</span>
+          <span class="tag tag-secondary">推荐</span>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid-2 gap-xs" style="margin-bottom:var(--spacing-md)">
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">初始投入</div>
+            <div style="font-size:20px; font-weight:700">¥280万</div>
+          </div>
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">年运维成本</div>
+            <div style="font-size:20px; font-weight:700">¥65万</div>
+          </div>
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">交付周期</div>
+            <div style="font-size:20px; font-weight:700">16 周</div>
+          </div>
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">团队需求</div>
+            <div style="font-size:20px; font-weight:700">8 人</div>
+          </div>
+        </div>
+
+        <!-- Pros -->
+        <div style="margin-bottom:var(--spacing-sm)">
+          <div class="text-caption" style="margin-bottom:4px; color:var(--color-positive)">优势</div>
+          <div class="flex-col gap-xs text-small">
+            <div>✓ 完全自主可控，无供应商锁定</div>
+            <div>✓ 深度定制能力，适配业务特殊需求</div>
+            <div>✓ 长期 TCO 更低（3年回本）</div>
+            <div>✓ 数据安全性高，不出内网</div>
+          </div>
+        </div>
+
+        <!-- Cons -->
+        <div>
+          <div class="text-caption" style="margin-bottom:4px; color:var(--color-negative)">风险</div>
+          <div class="flex-col gap-xs text-small">
+            <div>✗ 初期投入大，交付周期长</div>
+            <div>✗ 需要组建专业团队</div>
+            <div>✗ 技术债务自行承担</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Middle: Comparison Metrics -->
+      <div class="flex-col" style="justify-content:center; gap:var(--spacing-sm)">
+        <div class="card-elevated" style="text-align:center; padding:var(--spacing-sm)">
+          <div class="text-caption">3年 TCO</div>
+          <div class="text-small text-positive" style="font-weight:600">A 省 ¥120万</div>
+        </div>
+        <div class="card-elevated" style="text-align:center; padding:var(--spacing-sm)">
+          <div class="text-caption">上线速度</div>
+          <div class="text-small text-negative" style="font-weight:600">B 快 10 周</div>
+        </div>
+        <div class="card-elevated" style="text-align:center; padding:var(--spacing-sm)">
+          <div class="text-caption">定制灵活度</div>
+          <div class="text-small text-positive" style="font-weight:600">A 优</div>
+        </div>
+        <div class="card-elevated" style="text-align:center; padding:var(--spacing-sm)">
+          <div class="text-caption">运维复杂度</div>
+          <div class="text-small text-negative" style="font-weight:600">B 优</div>
+        </div>
+        <div class="card-elevated" style="text-align:center; padding:var(--spacing-sm)">
+          <div class="text-caption">扩展性</div>
+          <div class="text-small" style="font-weight:600; color:var(--text-secondary)">持平</div>
+        </div>
+        <div class="card-elevated" style="text-align:center; padding:var(--spacing-sm)">
+          <div class="text-caption">数据安全</div>
+          <div class="text-small text-positive" style="font-weight:600">A 优</div>
+        </div>
+        <div class="card-elevated" style="text-align:center; padding:var(--spacing-sm)">
+          <div class="text-caption">综合评分</div>
+          <div style="font-size:18px; font-weight:700; color:var(--color-secondary)">A: 78</div>
+          <div style="font-size:18px; font-weight:700; color:var(--color-tertiary)">B: 71</div>
+        </div>
+      </div>
+
+      <!-- Right: Option B -->
+      <div class="card flex-col" style="border-top:3px solid var(--color-tertiary)">
+        <div class="flex-between" style="margin-bottom:var(--spacing-md)">
+          <span style="font-size:var(--font-subtitle); font-weight:700; color:var(--color-tertiary)">方案 B：采购</span>
+          <span class="tag tag-tertiary">备选</span>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid-2 gap-xs" style="margin-bottom:var(--spacing-md)">
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">初始投入</div>
+            <div style="font-size:20px; font-weight:700">¥150万</div>
+          </div>
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">年运维成本</div>
+            <div style="font-size:20px; font-weight:700">¥120万</div>
+          </div>
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">交付周期</div>
+            <div style="font-size:20px; font-weight:700">6 周</div>
+          </div>
+          <div style="background:var(--bg-elevated); padding:var(--spacing-xs) var(--spacing-sm); border-radius:var(--radius)">
+            <div class="text-caption">团队需求</div>
+            <div style="font-size:20px; font-weight:700">3 人</div>
+          </div>
+        </div>
+
+        <!-- Pros -->
+        <div style="margin-bottom:var(--spacing-sm)">
+          <div class="text-caption" style="margin-bottom:4px; color:var(--color-positive)">优势</div>
+          <div class="flex-col gap-xs text-small">
+            <div>✓ 快速上线，6 周内可用</div>
+            <div>✓ 团队需求小，无需专业人才</div>
+            <div>✓ 供应商负责运维和升级</div>
+            <div>✓ 行业最佳实践内置</div>
+          </div>
+        </div>
+
+        <!-- Cons -->
+        <div>
+          <div class="text-caption" style="margin-bottom:4px; color:var(--color-negative)">风险</div>
+          <div class="flex-col gap-xs text-small">
+            <div>✗ 年费递增，长期成本高</div>
+            <div>✗ 定制受限，特殊需求难满足</div>
+            <div>✗ 数据出内网，合规风险</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: Recommendation -->
+    <div style="margin-top:var(--spacing-md); padding:var(--spacing-sm) var(--spacing-md); background:var(--bg-card); border-radius:var(--radius); border-left:3px solid var(--color-secondary)">
+      <span class="text-small" style="font-weight:600">决策建议：</span>
+      <span class="text-small">推荐方案 A（自建），核心考量为数据安全合规要求和 3 年 TCO 优势。建议 Q2 启动，Q3 末交付 MVP。</span>
+    </div>
+  </div>
+</body>
+</html>

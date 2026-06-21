@@ -1,0 +1,71 @@
+*.iml
+.gradle
+.externalNativeBuild
+.cxx
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+# 本地配置
+.claude/settings.local.json
+
+# 运行时过程产物（自动生成，不提交）
+handoffs/
+output/
+log/
+test/drafts/
+specs/drafts/
+specs/de-reports/drafts/
+specs/changes/
+specs/ux/drafts/
+specs/ux/changes/
+specs/approvals/
+specs/baselines/
+
+# 保留核心文件
+!.state.md
+!specs/proposal.md
+!specs/design.md
+!specs/requirement-spec.md
+!specs/plan-action.md
+!test/test-cases.md
+!specs/ux/ux-design.md
+
+# 归档历史数据（框架迁移前产物）
+archive/
+
+# reference 参考资料（使用者文件）
+reference/
+
+# MCP 服务器自动生成目录（zai-mcp-server）
+android-*/
+analytics/
+cache/
+codegen/
+collaboration/
+custom-templates/
+learning/
+memory/
+predictive/
+prompt-library/
+swarm/
+
+# PPT 模板样本（旧版残留，保留供 ppt output_type 使用）
+templates/ppt-templates/act-files/
+
+# 系统文件
+.DS_Store
+node_modules/
+*.log
+
+# 编辑器
+.vscode/
+!.vscode/settings.json
+.idea/
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>L05 - 四象限</title>
+  <link rel="stylesheet" href="../../ppt-base.css">
+</head>
+<body>
+  <div class="slide flex-col">
+    <!-- Header -->
+    <div class="slide-header">
+      <div class="slide-title">业务四象限分析</div>
+      <div class="slide-meta">按增长率 × 利润率分布</div>
+    </div>
+
+    <!-- 2x2 Grid -->
+    <div class="grid-2x2" style="flex:1">
+      <!-- Q1: High Growth + High Profit -->
+      <div class="card flex-col" style="border-top:3px solid var(--color-positive)">
+        <div class="flex-between" style="margin-bottom:var(--spacing-sm)">
+          <span style="font-weight:600; color:var(--color-positive)">明星业务</span>
+          <span class="tag tag-positive">高增长 · 高利润</span>
+        </div>
+        <table class="data-table" style="flex:1">
+          <thead>
+            <tr><th>业务</th><th>增长率</th><th>利润率</th><th>营收</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>企业版 SaaS</td><td class="text-positive">+45%</td><td>78%</td><td>¥1,200万</td></tr>
+            <tr><td>AI 增值服务</td><td class="text-positive">+120%</td><td>82%</td><td>¥680万</td></tr>
+            <tr><td>数据分析平台</td><td class="text-positive">+38%</td><td>71%</td><td>¥520万</td></tr>
+          </tbody>
+        </table>
+        <div class="text-caption" style="margin-top:var(--spacing-xs)">策略：加大投入，抢占市场份额</div>
+      </div>
+
+      <!-- Q2: Low Growth + High Profit -->
+      <div class="card flex-col" style="border-top:3px solid var(--color-secondary)">
+        <div class="flex-between" style="margin-bottom:var(--spacing-sm)">
+          <span style="font-weight:600; color:var(--color-secondary)">现金牛</span>
+          <span class="tag tag-secondary">低增长 · 高利润</span>
+        </div>
+        <table class="data-table" style="flex:1">
+          <thead>
+            <tr><th>业务</th><th>增长率</th><th>利润率</th><th>营收</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>基础版订阅</td><td>+5%</td><td>85%</td><td>¥2,100万</td></tr>
+            <tr><td>运维托管</td><td>+3%</td><td>72%</td><td>¥890万</td></tr>
+            <tr><td>培训认证</td><td>+8%</td><td>90%</td><td>¥340万</td></tr>
+          </tbody>
+        </table>
+        <div class="text-caption" style="margin-top:var(--spacing-xs)">策略：维持现状，利润回哺新业务</div>
+      </div>
+
+      <!-- Q3: High Growth + Low Profit -->
+      <div class="card flex-col" style="border-top:3px solid var(--color-quaternary)">
+        <div class="flex-between" style="margin-bottom:var(--spacing-sm)">
+          <span style="font-weight:600; color:var(--color-quaternary)">问题业务</span>
+          <span class="tag" style="background:rgba(212,168,83,0.15); color:var(--color-quaternary)">高增长 · 低利润</span>
+        </div>
+        <table class="data-table" style="flex:1">
+          <thead>
+            <tr><th>业务</th><th>增长率</th><th>利润率</th><th>营收</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>海外市场</td><td class="text-positive">+65%</td><td class="text-negative">12%</td><td>¥450万</td></tr>
+            <tr><td>IoT 平台</td><td class="text-positive">+42%</td><td class="text-negative">8%</td><td>¥280万</td></tr>
+            <tr><td>低代码平台</td><td class="text-positive">+55%</td><td class="text-negative">15%</td><td>¥190万</td></tr>
+          </tbody>
+        </table>
+        <div class="text-caption" style="margin-top:var(--spacing-xs)">策略：聚焦盈利模型验证，设定止损线</div>
+      </div>
+
+      <!-- Q4: Low Growth + Low Profit -->
+      <div class="card flex-col" style="border-top:3px solid var(--color-negative)">
+        <div class="flex-between" style="margin-bottom:var(--spacing-sm)">
+          <span style="font-weight:600; color:var(--color-negative)">瘦狗业务</span>
+          <span class="tag tag-negative">低增长 · 低利润</span>
+        </div>
+        <table class="data-table" style="flex:1">
+          <thead>
+            <tr><th>业务</th><th>增长率</th><th>利润率</th><th>营收</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>旧版私有部署</td><td class="text-negative">-8%</td><td class="text-negative">18%</td><td>¥320万</td></tr>
+            <tr><td>硬件代销</td><td class="text-negative">-15%</td><td class="text-negative">5%</td><td>¥150万</td></tr>
+            <tr><td>定制开发</td><td>+2%</td><td class="text-negative">12%</td><td>¥210万</td></tr>
+          </tbody>
+        </table>
+        <div class="text-caption" style="margin-top:var(--spacing-xs)">策略：逐步退出或转型，Q2 末完成评估</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

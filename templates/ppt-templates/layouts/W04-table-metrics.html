@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <title>W04 - 表格+侧边指标</title>
+  <link rel="stylesheet" href="../../ppt-light.css">
+</head>
+<body>
+<div class="slide">
+  <!-- Header -->
+  <div class="slide-header">
+    <div class="slide-title">产品线经营明细</div>
+    <div class="slide-meta">2024年度汇总 | 产品管理部</div>
+  </div>
+
+  <!-- Main Content: Table Left + Metrics Right -->
+  <div class="flex gap-lg" style="height: calc(100% - 72px);">
+    <!-- Left: Data Table -->
+    <div class="flex-col flex-1 gap-md" style="flex:2.2;">
+      <div class="section-bar">
+        <div class="section-title">各产品线营收与利润</div>
+      </div>
+      <div style="flex:1;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>产品线</th>
+              <th>营收（万元）</th>
+              <th>占比</th>
+              <th>利润率</th>
+              <th>同比</th>
+              <th style="width:160px;">营收进度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="flex gap-xs" style="align-items:center;"><span class="icon-dot"></span><strong>核心平台</strong></div></td>
+              <td style="font-weight:600;">52,800</td>
+              <td>41.3%</td>
+              <td><span class="text-positive">38.2%</span></td>
+              <td><span class="trend-arrow up">28.4%</span></td>
+              <td><div class="inline-bar"><div class="bar-track"><div class="bar-fill" style="width:95%;"></div></div><span style="font-size:10px;min-width:28px;">95%</span></div></td>
+            </tr>
+            <tr>
+              <td><div class="flex gap-xs" style="align-items:center;"><span class="icon-dot orange"></span><strong>电商业务</strong></div></td>
+              <td style="font-weight:600;">31,200</td>
+              <td>24.4%</td>
+              <td><span class="text-positive">22.6%</span></td>
+              <td><span class="trend-arrow up">35.1%</span></td>
+              <td><div class="inline-bar"><div class="bar-track"><div class="bar-fill" style="width:88%;background:var(--color-secondary);"></div></div><span style="font-size:10px;min-width:28px;">88%</span></div></td>
+            </tr>
+            <tr>
+              <td><div class="flex gap-xs" style="align-items:center;"><span class="icon-dot green"></span><strong>支付金融</strong></div></td>
+              <td style="font-weight:600;">21,500</td>
+              <td>16.8%</td>
+              <td><span class="text-positive">45.3%</span></td>
+              <td><span class="trend-arrow up">12.7%</span></td>
+              <td><div class="inline-bar"><div class="bar-track"><div class="bar-fill" style="width:82%;background:var(--color-positive);"></div></div><span style="font-size:10px;min-width:28px;">82%</span></div></td>
+            </tr>
+            <tr>
+              <td><div class="flex gap-xs" style="align-items:center;"><span class="icon-dot" style="background:var(--color-tertiary);"></span><strong>云服务</strong></div></td>
+              <td style="font-weight:600;">12,800</td>
+              <td>10.0%</td>
+              <td><span class="text-negative">-5.2%</span></td>
+              <td><span class="trend-arrow up">52.3%</span></td>
+              <td><div class="inline-bar"><div class="bar-track"><div class="bar-fill" style="width:72%;background:var(--color-tertiary);"></div></div><span style="font-size:10px;min-width:28px;">72%</span></div></td>
+            </tr>
+            <tr>
+              <td><div class="flex gap-xs" style="align-items:center;"><span class="icon-dot" style="background:var(--color-quaternary);"></span><strong>广告业务</strong></div></td>
+              <td style="font-weight:600;">6,400</td>
+              <td>5.0%</td>
+              <td><span class="text-positive">62.1%</span></td>
+              <td><span class="trend-arrow down">8.3%</span></td>
+              <td><div class="inline-bar"><div class="bar-track"><div class="bar-fill" style="width:64%;background:var(--color-quaternary);"></div></div><span style="font-size:10px;min-width:28px;">64%</span></div></td>
+            </tr>
+            <tr>
+              <td><div class="flex gap-xs" style="align-items:center;"><span class="icon-dot red"></span><strong>游戏娱乐</strong></div></td>
+              <td style="font-weight:600;">3,200</td>
+              <td>2.5%</td>
+              <td><span class="text-positive">18.7%</span></td>
+              <td><span class="trend-arrow down">15.2%</span></td>
+              <td><div class="inline-bar"><div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--color-negative);"></div></div><span style="font-size:10px;min-width:28px;">45%</span></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Bottom Trend Chart -->
+      <div class="chart-card" style="height:180px;">
+        <div class="flex-between">
+          <div class="chart-title">季度营收趋势对比（亿元）</div>
+          <div class="flex gap-sm">
+            <span class="color-tag"><span class="icon-dot"></span> 核心平台</span>
+            <span class="color-tag"><span class="icon-dot orange"></span> 电商</span>
+            <span class="color-tag"><span class="icon-dot green"></span> 支付</span>
+          </div>
+        </div>
+        <div style="flex:1;position:relative;padding-top:6px;">
+          <svg viewBox="0 0 600 100" style="width:100%;height:100%;" preserveAspectRatio="none">
+            <polyline points="0,70 150,55 300,42 450,30 600,18" fill="none" stroke="#2980F0" stroke-width="2"/>
+            <polyline points="0,82 150,72 300,58 450,48 600,35" fill="none" stroke="#FF7400" stroke-width="2"/>
+            <polyline points="0,88 150,82 300,78 450,72 600,68" fill="none" stroke="#078A3A" stroke-width="2"/>
+            <circle cx="0" cy="70" r="3" fill="#2980F0"/><circle cx="150" cy="55" r="3" fill="#2980F0"/><circle cx="300" cy="42" r="3" fill="#2980F0"/><circle cx="450" cy="30" r="3" fill="#2980F0"/><circle cx="600" cy="18" r="3" fill="#2980F0"/>
+            <circle cx="0" cy="82" r="3" fill="#FF7400"/><circle cx="150" cy="72" r="3" fill="#FF7400"/><circle cx="300" cy="58" r="3" fill="#FF7400"/><circle cx="450" cy="48" r="3" fill="#FF7400"/><circle cx="600" cy="35" r="3" fill="#FF7400"/>
+            <text x="0" y="98" font-size="9" fill="#999">Q1</text><text x="150" y="98" font-size="9" fill="#999">Q2</text><text x="300" y="98" font-size="9" fill="#999">Q3</text><text x="450" y="98" font-size="9" fill="#999">Q4</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <!-- Right: KPI Metrics Column -->
+    <div class="flex-col gap-md" style="flex:0.8;">
+      <div class="section-bar">
+        <div class="section-title">关键指标</div>
+      </div>
+
+      <!-- KPI Card 1 -->
+      <div class="stat-card" style="border-left:3px solid var(--color-primary);">
+        <div class="stat-label">总营收</div>
+        <div class="stat-value" style="font-size:22px;">¥12.8亿</div>
+        <div class="flex-between">
+          <span class="trend-arrow up">23.5%</span>
+          <div class="mini-ring" style="--ring-pct:87;width:36px;height:36px;">
+            <span class="ring-value" style="font-size:9px;">87%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Card 2 -->
+      <div class="stat-card" style="border-left:3px solid var(--color-secondary);">
+        <div class="stat-label">综合利润率</div>
+        <div class="stat-value" style="font-size:22px;">28.6%</div>
+        <div class="flex-between">
+          <span class="trend-arrow up">3.2pp</span>
+          <div class="mini-ring" style="--ring-pct:95;--ring-color:#FF7400;width:36px;height:36px;">
+            <span class="ring-value" style="font-size:9px;">95%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Card 3 -->
+      <div class="stat-card" style="border-left:3px solid var(--color-positive);">
+        <div class="stat-label">研发投入占比</div>
+        <div class="stat-value" style="font-size:22px;">18.3%</div>
+        <div class="flex-between">
+          <span class="trend-arrow up">2.1pp</span>
+          <div class="mini-ring" style="--ring-pct:92;--ring-color:#078A3A;width:36px;height:36px;">
+            <span class="ring-value" style="font-size:9px;">92%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Card 4 -->
+      <div class="stat-card" style="border-left:3px solid var(--color-tertiary);">
+        <div class="stat-label">人均效能</div>
+        <div class="stat-value" style="font-size:22px;">¥86万</div>
+        <div class="flex-between">
+          <span class="trend-arrow up">15.2%</span>
+          <div class="mini-ring" style="--ring-pct:96;--ring-color:#8B5CF6;width:36px;height:36px;">
+            <span class="ring-value" style="font-size:9px;">96%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Tag -->
+      <div class="compact-card" style="background:var(--bg-muted);text-align:center;padding:10px;">
+        <div style="font-size:11px;color:var(--text-muted);">综合评级</div>
+        <div style="font-size:18px;font-weight:700;color:var(--color-positive);margin-top:2px;">A+</div>
+        <div style="font-size:10px;color:var(--text-muted);">超额完成年度目标</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
