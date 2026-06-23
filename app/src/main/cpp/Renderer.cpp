@@ -143,6 +143,11 @@ void Renderer::render() {
         shader_->drawModel(*speedUpModel_);
     }
 
+    // Score in PLAYING
+    if (gameState_ == GameState::PLAYING && scoreModel_) {
+        shader_->drawModel(*scoreModel_);
+    }
+
     shaderNeedsNewProjectionMatrix_ = true;
 
     auto swapResult = eglSwapBuffers(display_, surface_);
@@ -227,6 +232,10 @@ void Renderer::initRenderer() {
     createSnakeAssets();
     createSpeedControls();
     initSnake();
+
+    // Initialize audio engine
+    audioEngine_ = std::unique_ptr<AudioEngine>(new AudioEngine());
+    audioEngine_->init(app_);
 }
 
 void Renderer::updateRenderArea() {
@@ -398,6 +407,8 @@ void Renderer::initSnake() {
     nextDir_ = SnakeDir::RIGHT;
     moveTimer_ = 0;
     moveInterval_ = kMoveIntervals[speedLevel_ - 1];
+    score_ = 0;
+    updateScoreLabel();
     gameOver_ = false;
     spawnFood();
 }
@@ -448,17 +459,28 @@ void Renderer::updateSnake(float dt) {
             case SnakeDir::RIGHT: head.first++; break;
         }
 
-        // Wall collision
+        // Wall collision → score -1, reverse direction, no game over
         if (head.first < 0 || head.first >= gridSize_ ||
             head.second < 0 || head.second >= gridSize_) {
-            gameState_ = GameState::GAME_OVER;
+            score_--;
+            updateScoreLabel();
+            switch (snakeDir_) {
+                case SnakeDir::UP:    snakeDir_ = SnakeDir::DOWN;  break;
+                case SnakeDir::DOWN:  snakeDir_ = SnakeDir::UP;    break;
+                case SnakeDir::LEFT:  snakeDir_ = SnakeDir::RIGHT; break;
+                case SnakeDir::RIGHT: snakeDir_ = SnakeDir::LEFT;  break;
+            }
+            nextDir_ = snakeDir_;
             return;
         }
 
         // Self collision (check against current body before adding new head)
         for (const auto &seg : snakeSegments_) {
             if (seg.first == head.first && seg.second == head.second) {
+                score_ = 0;
+                updateScoreLabel();
                 gameState_ = GameState::GAME_OVER;
+                if (audioEngine_) audioEngine_->playGameOver();
                 return;
             }
         }
@@ -467,6 +489,9 @@ void Renderer::updateSnake(float dt) {
 
         // Food check
         if (head.first == foodPos_.first && head.second == foodPos_.second) {
+            score_++;
+            updateScoreLabel();
+            if (audioEngine_) audioEngine_->playEat();
             spawnFood();
         } else {
             snakeSegments_.pop_back();
@@ -530,6 +555,31 @@ void Renderer::renderSnake() {
         auto model = makeCellModel(seg.first, seg.second, tex, false);
         shader_->drawModel(model);
     }
+}
+
+void Renderer::updateScoreLabel() {
+    int fontScale = std::max(2, std::min(4, width_ / 960));
+    char buf[32];
+    int n = score_;
+    buf[0] = 'S'; buf[1] = 'C'; buf[2] = 'O'; buf[3] = 'R'; buf[4] = 'E'; buf[5] = ':'; buf[6] = ' ';
+    if (n < 0) { buf[7] = '-'; n = -n; } else { buf[7] = ' '; }
+    int pos = 8;
+    if (n >= 100) { buf[pos++] = '0' + (n / 100) % 10; }
+    if (n >= 10)  { buf[pos++] = '0' + (n / 10) % 10; }
+    buf[pos++] = '0' + (n % 10);
+    buf[pos] = 0;
+
+    auto newTex = TextureAsset::createText(0, 0, 0, 0, buf, fontScale);
+    float cx = 0.08f, cy = 0.92f;
+    float hw = 0.14f, hh = 0.05f;
+    std::vector<Vertex> verts = {
+        Vertex(Vector3{cx + hw, cy + hh, 0}, Vector2{1, 0}),
+        Vertex(Vector3{cx - hw, cy + hh, 0}, Vector2{0, 0}),
+        Vertex(Vector3{cx - hw, cy - hh, 0}, Vector2{0, 1}),
+        Vertex(Vector3{cx + hw, cy - hh, 0}, Vector2{1, 1}),
+    };
+    std::vector<Index> idx = {0, 1, 2, 0, 2, 3};
+    scoreModel_ = std::unique_ptr<Model>(new Model(std::move(verts), std::move(idx), newTex));
 }
 
 void Renderer::handleInput() {
@@ -613,6 +663,15 @@ bool Renderer::handleButtonDown(float nx, float ny) {
     // Check button hits
     for (const auto &btn : buttons_) {
         if (btn.visibleIn == gameState_ && hitTest(btn, nx, ny)) {
+            // Play sound effects based on state transitions
+            if (btn.visibleIn == GameState::MENU && btn.targetState == GameState::PLAYING) {
+                if (audioEngine_) audioEngine_->playStart();
+            } else if (btn.visibleIn == GameState::PLAYING && btn.targetState == GameState::PAUSED) {
+                if (audioEngine_) audioEngine_->playPause();
+            } else if (btn.visibleIn == GameState::PLAYING && btn.targetState == GameState::GAME_OVER) {
+                if (audioEngine_) audioEngine_->playGameOver();
+            }
+
             if (btn.targetState == GameState::PLAYING &&
                 (btn.visibleIn == GameState::MENU || btn.visibleIn == GameState::GAME_OVER)) {
                 initSnake();

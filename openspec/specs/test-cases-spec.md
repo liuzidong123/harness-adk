@@ -1,9 +1,9 @@
-# SnakeShot Button-Menu 白盒测试用例规格
+# SnakeShot 测试用例规格
 
-**版本:** v1
+**版本:** v2.1
 **状态:** draft
 **负责人:** TE
-**依据规格:** specs/button-menu-spec.md v3, specs/game-logic-spec.md v2
+**依据规格:** openspec/specs/button-menu-spec.md v3, openspec/specs/scoring-spec.md v1
 **覆盖目标:**
 - 行覆盖 ≥ 80%
 - 分支覆盖 ≥ 70%
@@ -222,6 +222,85 @@ gridToUIY(gy) = 0.14 + (gy + 0.5) * 0.037
 | CC-04 | 墙壁碰撞: y≥20 | head=(10,20) | gameState_ = GAME_OVER |
 | CC-05 | 自身碰撞: 与第1节 | head=(10,10) + body=(10,10) | gameState_ = GAME_OVER |
 | CC-06 | 无碰撞 | head=(11,10), body 无此坐标 | 正常移动, push_front |
+
+---
+
+## 10. 音效播放 — Audio SFX
+
+**源文件:** AudioEngine.cpp, Renderer.cpp
+**依据规格:** openspec/specs/audio-sfx-spec.md v1
+
+| TC-ID | 场景 | 操作 | 期望结果 | SHALL 映射 |
+|-------|------|------|---------|-----------|
+| AU-01 | 开始音效 | MENU 下点击 START 按钮 | `audioEngine_->playStart()` 被调用 | SHALL-001 |
+| AU-02 | 暂停音效 | PLAYING 下点击 PAUSE 按钮 | `audioEngine_->playPause()` 被调用 | SHALL-002 |
+| AU-03 | 吃食物音效 | 蛇头移动到食物位置 | `audioEngine_->playEat()` 被调用 | SHALL-003 |
+| AU-04 | 碰撞 GameOver 音效 | 蛇头撞击墙壁或自身 | `audioEngine_->playGameOver()` 被调用 | SHALL-004 |
+| AU-05 | STOP按钮 GameOver 音效 | PLAYING 下点击 STOP 按钮 | `audioEngine_->playGameOver()` 被调用 | SHALL-004 |
+| AU-06 | 异步播放不阻塞 | 音效播放时，主循环帧率不受影响 | 播放在 `std::thread` 中进行，不阻塞 | SHALL-005 |
+| AU-07 | WAV 资源加载 | AudioEngine::init() 执行 | 4 个 WAV 文件从 assets 正确加载 | SHALL-006 |
+| AU-08 | WAV 解析失败容错 | 提供无效 WAV 文件 | `loadWav` 返回空 SoundBuffer，不崩溃 | - |
+| AU-09 | 无音效时优雅降级 | AudioEngine 未初始化时调用 play* 方法 | 无崩溃，无副作用 | - |
+
+---
+
+## 11. 计分逻辑 — Scoring
+
+**源文件:** Renderer.cpp:455-480  
+**依据规格:** openspec/specs/scoring-spec.md v1
+
+### 11.1 食物加分
+
+| TC-ID | 场景 | 操作 | 期望结果 | SHALL 映射 |
+|-------|------|------|---------|-----------|
+| SC-01 | 吃食物加分 | 蛇头移动到食物所在格子 | score_ 增加 1 | SHALL-001 |
+| SC-02 | 非食物不加分 | 蛇头移动到无食物格子 | score_ 不变 | SHALL-001 |
+
+### 11.2 碰墙减分 + 方向调转
+
+| TC-ID | 场景 | 操作 | 期望结果 | SHALL 映射 |
+|-------|------|------|---------|-----------|
+| SC-03 | 碰墙减分 | 蛇头超出左边界 (x<0) | score_ 减少 1 | SHALL-002 |
+| SC-04 | 碰墙上边界 | 蛇头超出上边界 (y>=20) | score_ 减少 1 | SHALL-002 |
+| SC-05 | 碰墙方向调转(UP→DOWN) | 蛇头超出上边界 | snakeDir_ 变为 DOWN | SHALL-002 |
+| SC-06 | 碰墙方向调转(DOWN→UP) | 蛇头超出下边界 | snakeDir_ 变为 UP | SHALL-002 |
+| SC-07 | 碰墙方向调转(LEFT→RIGHT) | 蛇头超出左边界 | snakeDir_ 变为 RIGHT | SHALL-002 |
+| SC-08 | 碰墙方向调转(RIGHT→LEFT) | 蛇头超出右边界 | snakeDir_ 变为 LEFT | SHALL-002 |
+| SC-09 | 碰墙不触发 GameOver | 蛇头超出任意边界 | gameState_ 不变 (仍为 PLAYING) | SHALL-002 |
+| SC-10 | 碰墙蛇头不移动 | 蛇头超出左边界 | 不执行 push_front，蛇头位置不变 | SHALL-002 |
+
+### 11.3 GameOver 计分清零
+
+| TC-ID | 场景 | 操作 | 期望结果 | SHALL 映射 |
+|-------|------|------|---------|-----------|
+| SC-11 | 自碰计分清零 | 蛇头撞到自身身体 | score_ = 0, gameState_ = GAME_OVER | SHALL-003 |
+
+### 11.4 分数显示
+
+| TC-ID | 场景 | 操作 | 期望结果 | SHALL 映射 |
+|-------|------|------|---------|-----------|
+| SC-12 | 正分显示 | score_ = 42 | 文本显示 "SCORE:  42" | SHALL-004 |
+| SC-13 | 负分显示 | score_ = -7 | 文本显示 "SCORE: -7" | SHALL-005 |
+| SC-14 | 零分显示 | score_ = 0 | 文本显示 "SCORE:  0" | SHALL-004 |
+| SC-15 | 三位数显示 | score_ = 123 | 文本显示 "SCORE: 123" | SHALL-004 |
+
+### 11.5 追溯矩阵（Scoring）
+
+| SHALL | 测试用例 |
+|-------|---------|
+| SHALL-001 | SC-01, SC-02 |
+| SHALL-002 | SC-03 ~ SC-10 |
+| SHALL-003 | SC-11 |
+| SHALL-004 | SC-12, SC-14, SC-15 |
+| SHALL-005 | SC-13 |
+
+## 版本历史
+
+| 版本 | 日期 | 变更 |
+|------|------|------|
+| v1 | - | 初始版本（Button-Menu 测试用例） |
+| v2 | 2026-06-24 | 新增音效播放测试用例（AU-01~09） |
+| v2.1 | 2026-06-24 | 新增计分逻辑测试用例（SC-01~15） |
 
 ---
 

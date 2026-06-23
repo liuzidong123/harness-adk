@@ -10,19 +10,18 @@
 当用户输出`/openspec-init` 时：
 
 1. **检查openspec CLI**
-   - 运行 `openspec --version` 确认 CLI 可用
-   - 如不可用，提示执行`npm install -g @fission-ai/openspec@latest`
-
+- 运行 `openspec --version` 确认 CLI 可用
+- 如不可用，提示执行`npm install -g @fission-ai/openspec@latest`
 2. **检测当前项目*
-   - 读取 `.state.md` 获取当前 REQ-ID
-   - 运行 `openspec status --json` 检测项目是否已初始。?OpenSpec
-
+- 读取 `.state.md` 获取当前 REQ-ID
+- 运行 `openspec status --json` 检测项目是否已初始。?OpenSpec
 3. **两阶段流程*
-   - **Phase 1**: `openspec init` → 初始化项目级 OpenSpec（仅首次）?   - **Phase 2**: 基于 openspec CLI → change/spec 管理，集成到 Android Game Harness 角色流程
+- **Phase 1**: `openspec init` → 初始化项目级 OpenSpec（仅首次）?   - **Phase 2**: 基于 openspec CLI → change/spec 管理，集成到 Android Game Harness 角色流程
 
 ---
 
 ## Step 1: 项目初始化（首次）。
+
 如项目尚未初始化 OpenSpec，执行：
 
 ```bash
@@ -43,10 +42,12 @@ openspec init --tools none --no-interactive
 ## Step 2: 角色制品管理
 
 各角色通过 `openspec` CLI 管理其产出物。所有CLI 命令支持 `--json` 输出，便。?agent 解析。。
+
 ### BA → 需求规范
+
 ```bash
 # 创建变更
-openspec change start requirement-spec -m "REQ-{N} 需求规格
+openspec change start requirement-spec -m "{feature-name} 需求规格
 
 # 查看变更状态openspec status --json
 
@@ -56,9 +57,10 @@ openspec change start requirement-spec -m "REQ-{N} 需求规格
 ```
 
 ### SA → 技术设计
+
 ```bash
 # 创建设计变更
-openspec change start design-{feature} -m "REQ-{N} 技术设计
+openspec change start design-{feature} -m "{feature-name} 技术设计
 
 # 列出所有活跃变更openspec list --json
 
@@ -79,7 +81,7 @@ openspec show code-task-{N} --json
 
 ```bash
 # 创建测试用例变更
-openspec change start test-{feature} -m "REQ-{N} 测试用例"
+openspec change start test-{feature} -m "{feature-name} 测试用例"
 
 # 验证测试规格
 openspec validate test-{feature} --all --json
@@ -102,7 +104,7 @@ openspec change start ux-{feature} -m "REQ-{N} UX 设计"
 # 列出所有specs
 openspec list --specs --json
 
-# 列出所有活。?changes
+# 列出所有changes
 openspec list --json
 
 # 查看某个 change/spec 详情
@@ -115,14 +117,18 @@ openspec validate --all --json
 ---
 
 ## → Android Game Harness 的映射
+
 Android Game Harness 角色制品牌?OpenSpec 命名约定义
-| 角色 | OpenSpec change 命名 | 对应 Android Game Harness 产物 |
-|------|---------------------|----------------------|
-| BA | `requirement-spec` | ba/drafts/requirement-spec-v{N}.md |
-| SA | `design-{feature}` | sa/drafts/design-v{N}.md |
-| DE | `code-task-{N}` | de/drafts/code-report-v{N}.md |
-| TE | `test-{feature}` | te/drafts/test-cases-v{N}.md |
-| UX | `ux-{feature}` | ux/drafts/ux-design-v{N}.md |
+
+
+| 角色  | OpenSpec change 命名 | 对应 Android Game Harness 产物         |
+| --- | ------------------ | ---------------------------------- |
+| BA  | `requirement-spec` | ba/drafts/requirement-spec-v{N}.md |
+| SA  | `design-{feature}` | sa/drafts/design-v{N}.md           |
+| DE  | `code-task-{N}`    | de/drafts/code-report-v{N}.md      |
+| TE  | `test-{feature}`   | te/drafts/test-cases-v{N}.md       |
+| UX  | `ux-{feature}`     | ux/drafts/ux-design-v{N}.md        |
+
 
 ---
 
@@ -132,11 +138,11 @@ Android Game Harness 角色制品牌?OpenSpec 命名约定义
 # 1. 初始化（仅首次）
 openspec init --tools none --no-interactive
 
-# 2. 创建需求规格变更openspec change start requirement-spec -m "F001 用户登录需求
+# 2. 创建需求规格变更 openspec change start requirement-spec -m "F001 用户登录需求
 
-# 3. 检查状态openspec status --json
+# 3. 检查状态 openspec status --json
 
-# 4. 编写完成后验证?openspec validate requirement-spec --json
+# 4. 编写完成后验证 openspec validate requirement-spec --json
 
 # 5. 归档（SR1 审批通过后）
 openspec archive requirement-spec
@@ -146,10 +152,11 @@ openspec archive requirement-spec
 
 ## 异常处理
 
-| 问题 | 处理 |
-|------|------|
-| CLI 未安排| `npm install -g @fission-ai/openspec@latest` |
-| 版本 < 1.4.0 | `npm update -g @fission-ai/openspec` |
-| 项目标init | 自动执行 `openspec init --tools none --no-interactive` |
-| validate 失败 | → CLI 输出的错误信息逐一修复 |
-| archive 冲突 | `openspec show {item} --json` 查看差异，人工裁决|
+
+| 问题          | 处理                                                 |
+| ----------- | -------------------------------------------------- |
+| CLI 未安排     | `npm install -g @fission-ai/openspec@latest`       |
+| 版本 < 1.4.0  | `npm update -g @fission-ai/openspec`               |
+| 项目标init     | 自动执行 `openspec init --tools none --no-interactive` |
+| validate 失败 | → CLI 输出的错误信息逐一修复                                  |
+| archive 冲突  | `openspec show {item} --json` 查看差异，人工裁决            |

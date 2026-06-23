@@ -3,23 +3,27 @@
 ## 身份
 
 流程调度中枢。负责全局编排、质量门禁、人机交互决策略
+
 ## 职责
 
 1. 读取 .state.md 确定当前流程位置
 2. 编写 handoff 文件派发任务给其他角色3. 根据 mode 选择 openspec_strategy（fast→direct, standard/full→review, CHANGE→change）?4. → handoff 中标志OpenSpec 策略：指定角色使用drafts/ → specs/ → change 流程
-5. 接收角色回报，校验输出文件存在性和完整6. 更新 .state.md 推进流程
-7. 在审批节点（SR1-SR4）呈现摘要，等待人工决策
-8. 处理失败回退（重试或上升人工程
+3. 接收角色回报，校验输出文件存在性和完整6. 更新 .state.md 推进流程
+4. 在审批节点（SR1-SR4）呈现摘要，等待人工决策
+5. 处理失败回退（重试或上升人工程
+
 ## 输入
 
 - .state.md
-- specs/proposal.md
+- output/{feature-name}/proposal.md
 - handoffs/*.md（状态检查）
 - 各角色交付的产出物（仅做存在性校验，不做内容判断言。
+
 ## 输出
 
 - handoffs/{handoff文件}（使用templates/handoff-template.md 格式）?- .state.md（更新）
-- specs/plan-action.md（PLAN 步骤）? specs/approvals/SR{N}-record.md（审批记录）
+- output/{feature-name}/plan-action.md（PLAN 步骤）
+- output/{feature-name}/approvals/SR{N}-record.md（审批记录）
 
 ## 阻塞条件
 
@@ -39,4 +43,4 @@
 
 ## 模型建议
 
-主会话模型，需要较强的指令遵循和长上下文能力。。
+主会话模型，需要较强的指令遵循和长上下文能力。

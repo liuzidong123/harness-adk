@@ -17,9 +17,9 @@
 
 #### Step 1: 收集项目元数据
 
-向用户提问（每轮  个问题）→ 
+向用户提问（每轮  个问题）→
 
-1. **项目名称**：用于生成目录名和文件引用（）?`tv-input-service`→ 
+1. **项目名称**：用于生成目录名和文件引用（）?`tv-input-service`→
 2. **项目主语言**：Java / Kotlin / Python / Go / 其他
 3. **构建系统**：Android.bp / pom.xml / Makefile / 其他
 
@@ -131,7 +131,7 @@
        ├── tvinput.md（可选）
        └── database.md（可选）
 
-4. tspec/ 目录
+4. openspec/ 目录
    ├── changes/
    →   └── archive/
    └── specs/

@@ -13,16 +13,16 @@
 ## 输入
 
 - handoff 白名单指定的文件（通常包括）：
-  - reference/ 下的参考资料  - specs/proposal.md
+    - reference/ 下的参考资料  - specs/proposal.md
 
 ## 输出（OpenSpec 格式
 
 
-| 策略     | 输出路径                                                                                             | 说明            |
-| ------ | ------------------------------------------------------------------------------------------------ | ------------- |
-| direct | `openspec/specs/{feature-name}-requirements.md`                                                  | 直接产出，PM 校验后为最 |
-| review | `openspec/specs/{feature-name}-requirements.md` ?`openspec/specs/{feature-name}-requirements.md` | 草稿 ?审批后定义     |
-| change | `openspec/specs/{feature-name}-requirements.md` 修改 ?`openspec/changes/{YYYYMMDD}-{desc}.md`      | 变更既有规格        |
+| 策略     | 输出路径                                                                                            | 说明            |
+| ------ | ----------------------------------------------------------------------------------------------- | ------------- |
+| direct | `openspec/specs/{feature-name}-requirements.md`                                                 | 直接产出，PM 校验后为最 |
+| review | `openspec/specs/{feature-name}-requirements.md` `openspec/specs/{feature-name}-requirements.md` | 草稿 ?审批后定义     |
+| change | `openspec/specs/{feature-name}-requirements.md` 修改`openspec/changes/{YYYYMMDD}-{desc}.md`       | 变更既有规格        |
 
 
 ### 输出格式
@@ -64,9 +64,9 @@ status: draft | review | approved
 
 | 模式       | BA 是否激活 | 条件                  |
 | -------- | ------- | ------------------- |
-| full     | ?       | propose 阶段首个步骤 (BA) |
-| standard | ?(默认)   | 仅当需求范围不明确或复杂时PM 按需激 |
-| fast     | ?       | 跳过                  |
+| full     | 是       | propose 阶段首个步骤 (BA) |
+| standard | (默认)    | 仅当需求范围不明确或复杂时PM 按需激 |
+| fast     | 否       | 跳过                  |
 
 
 ## 阻塞条件
@@ -82,10 +82,16 @@ status: draft | review | approved
 - 禁止读取白名单外的文件- 禁止引用对话历史中其他角色的推理
 - 禁止修改 proposal.md 或其他上游制品- 禁止跳过 OpenSpec 版本号和变更历史
 
-## OpenSpec 工作为
+## OpenSpec 工作要求
 
-BA 产出需求规格时遵循 `skills/agh-openspec.md` 定义OpenSpec 协议1. 根据 handoff ?`openspec_strategy` 确定策略（direct/review/change?2. 检测当前版本号（读取已→ specs/ ?drafts/?3. 产出制品并标注版本号
-4. 填写追溯矩阵和变更历史5. direct 策略 ?PM 直接校验；review 策略 ?等待人工审批后定义
+BA 产出需求规格时遵循 `skills/agh-openspec.md` 定义OpenSpec 协议
+
+1. 根据 handoff中`openspec_strategy` 确定策略（direct/review/change）
+2. 检测当前版本号（读取已output/{feature-name}/specs/drafts/）
+3. 产出制品并标注版本号
+4. 填写追溯矩阵和变更历史
+5. direct 策略 PM 直接校验；
+6. review 策略 等待人工审批后定义
 
 ## 模型建议
 

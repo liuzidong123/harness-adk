@@ -1,33 +1,43 @@
 # Android Game Harness - 安卓游戏驾驭系统
-本项目是一个由Agent驱动的安卓游戏驾驭系统框架。实现从需求到高质量交付的自动化生产出
+
+## 本项目是一个由Agent驱动的安卓游戏驾驭系统框架。实现从需求到高质量交付的自动化生产出
 本项目*主要目的是搭建一个基础Workflow框架**，从需求到交付各子智能体间任务编排清晰，各任务输入输出明确可以校验，后续开发可相互解析。
----
 
 ## 1、架构：四层递进防线
 
-四层防线。约束力由弱到期 递进排列。每一层专门弥补上一层的固有缺陷害。
+四层防线按**约束力由弱到强**递进排列。每一层专门弥补上一层的固有缺陷：
+
 ### 第一层：Rules -- 行为约束
 
-**解决问题： Agent最常犯的低级错误---修改后无基础自检、擅自改动上游制品牌。
-**实现方式： 1个md文件，约束全局纪律。一定要精简。
-**固有局限： Rules本质是自然语言指令，Agent对其的遵守程度随上下文复杂度增加而下降。无法保留00%执行。
+**解决问题：** Agent最常犯的低级错误----修改后无基础自检、擅自改动上游制品。
+
+**实现方式：** 1个md文件，约束全局纪律。**一定要精简**。
+
+**固有局限：** Rules本质是自然语言指令，Agent对其的遵守程度随上下文复杂度增加而下降。无法保证100%执行。
 
 ### 第二层：Skills -- 标准操作规程
 
-**解决问题： 具体操作步骤。?Agent 临场发挥，行为发散导致结果的不可预测性提升级。
-**实现方式： Skill 文件，每个封装一套固定步骤的 SOP（标准操作规程）。所有重复性操作不依赖 Agent 记忆。
-**设计原则： Rule 定义"什么必须做"，Skill 定义"具体怎么。?。二者分离后，Rule 保持简洁，Skill 承载执行细节俭。
+**解决问题：** 具体操作步骤由 Agent 临场发挥，行为发散导致结果的不可预测性提升。
+
+**实现方式：** 6 个 Skill 文件，每个封装一套固定步骤的 SOP（标准操作规程）。所有重复性操作不依赖 Agent 记忆。
+
+**设计原则：** Rule 定义"什么必须做"，Skill 定义"具体怎么做"。二者分离后，Rule 保持简洁，Skill 承载执行细节。
 
 ### 第三层：Agents + Workflow -- 角色制衡
 
-**解决问题： 单一 Agent 自审的结构性失效。写需求的人不应该同时审需求，写代码的人不应该同时做终验证。
-**实现方式： Agent 角色，每个具有独立的契约定义（输出输出/阻塞条件/禁止事项），通过固定编排布?Workflow 接力执行。
-**固有局限： 角色和流程仍属于"指令。?约束，Agent 声称"已完整时缺少独立的客观验证手段。
+**解决问题：** 单一 Agent 自审的结构性失效。写需求的人不应该同时审需求，写代码的人不应该同时做终验。
+
+**实现方式：** 6 个 Agent 角色，每个具有独立的契约定义（输入/输出/阻塞条件/禁止事项），通过固定编排的 Workflow 接力执行。
+
+**固有局限：** 角色和流程仍属于"指令层"约束，Agent 声称"已完成"时缺少独立的客观验证手段。
 
 ### 第四层：Scripts + 人工 -- 硬校验
-**解决问题： 前三层仍属于指令层约束，Agent 声称"已完整时缺少机器化验证。
-**实现方式： 3 个硬校验脚本以退出码作为唯一判据—→ verify.sh（A/B/C 三类检查点）、baseline.sh（前后对比）、check-harness.sh（框架自检）。每次交付必须由人工审核通过再进行下一任务。
-**设计原则：  交付判定不依赖Agent 自述，依赖程序退出码。
+
+**解决问题：** 前三层仍属于指令层约束，Agent 声称"已完成"时缺少机器化验证。
+
+**实现方式：** 3 个硬校验脚本以退出码作为唯一判据—— verify.sh（A/B/C 三类检查点）、baseline.sh（前后对比）、check-harness.sh（框架自检）。每次交付必须由人工审核通过再进行下一任务。
+
+**设计原则：** 交付判定不依赖 Agent 自述，依赖程序退出码。
 
 ### 递进关系，非替代关系
 
@@ -40,36 +50,44 @@ Rule设定约束 --> Skill标准化执行--> Agent角色制衡 --> Script硬性�
 #### PM - 项目经理
 
 流程调度中枢。读结论、发任务、处理回退、执行Spec Merge。不参与需求定义、方案设计或技术判断言。
+
 #### BA - 需求分析师
 
 将模糊需求转化为SHALL + GWT格式的结构化需求。不参与方案设计或技术判断言。
+
 #### SA -- 方案架构建
+
 将结构化需求翻译为技术方案。包含需求->技术落实对照表、时序图、Tasks清单纯。
+
 #### DE -- 开发工程师
 
-强制TDD模式：编写测试（FAIL）?->实现代码（PASS）?->重构-->执行dev-test Skill-->执行post-verify Skill→ 
+强制TDD模式：编写测试（FAIL）?->实现代码（PASS）?->重构-->执行dev-test Skill-->执行post-verify Skill→
+
 #### TE -- 测试工程师
+
 交付链的最终验收环节。根据strategy 选择验证方法（E2E/单元/集成/冒烟/人工/工程验证），确保产出物符合需求规格。。
+
 #### UX -- 设计师
-产出物的视觉/结构设计师。根据t_type 产出不同设计制品（PPT wireframe / UI 设计 / API 设计文档等）→ 
+
+产出物的视觉/结构设计师。根据t_type 产出不同设计制品（PPT wireframe / UI 设计 / API 设计文档等）→
+
 #### Agent契约结构
 
 每个Agent定义文件内嵌完整的角色契约：身份-->职责-->输入-->输出-->阻塞条件-->禁止事项-->模型建议。一个文件即一个角色的完整规范，维护不分散。。
 
-
 ## 3、研发流程：需求澄清+ 三段式接口+ 人工审批
 
-完整研发流程按触发命令划分为四个分段：clarify（人机协作打造osal + 产出类型选择）、propose（自动化需求→方案→评审）、apply（自动化开发→审查→测试→待归档）、archive（人工确认触发Spec Merge + 归档）→ 
+完整研发流程按触发命令划分为四个分段：clarify（人机协作打造osal + 产出类型选择）、propose（自动化需求→方案→评审）、apply（自动化开发→审查→测试→待归档）、archive（人工确认触发Spec Merge + 归档）→
 流程设有两道人工审批：SA方案设计和PM任务编排后、TE测试验证PASS后。每个阶段骨架如下：
 
 **/agh-clarify**
 `init-task.sh → 人机协作打磨 proposal.md → 消除歧义 + 定稿`
 
 **/agh-propose**
-`BA 需求分析。?SA 方案设计 → PM 任务计划编排 → 人工审批 1`
+`BA 需求分析 → SA 方案设计 → PM 任务计划编排 → 人工审批 1`
 
 **/agh-apply**
-`DE TDD 开发芽?TE 审计验证 → 人工审批 2`
+`DE TDD 开发 → TE 审计验证 → 人工审批 2`
 
 **/agh-archive**
 `→ Spec Merge + mv 归档 + board DONE`
@@ -77,26 +95,30 @@ Rule设定约束 --> Skill标准化执行--> Agent角色制衡 --> Script硬性�
 ---
 
 ## 4、产出类型（output_type）。
-框架支持任意类型的需求开发。在 clarify 阶段通过 output_type 参数指定产出物类型，后续流程自动适配置
-| output_type | 说明 | 默认验证策略 |
-|-------------|------|-------------|
-| android-app | Android 原生应用（Kotlin/C++ + OpenGL ES）?| 单元测试 / 集成测试 |
-| backend-api | 后端服务/API | 集成测试 |
-| cli-tool | 命令行工程| 集成测试 |
-| data-pipeline | 数据管道/ETL | 冒烟测试 |
-| infrastructure | 基础设施代码（Terraform/K8s）?| 冒烟测试 |
-| documentation | 文档/规格 | 人工审阅 |
-| ppt | 演示文稿/HTML slides | 人工 + verify-game.sh |
-| library | → SDK | 单元测试 |
-| custom | 自定义| 用户指定 |
 
-output_type → mode（fast/standard/full）正交：mode 控制流程严谨度，output_type 控制产出物和验证方式。。
----
+框架支持任意类型的需求开发。在 clarify 阶段通过 output_type 参数指定产出物类型，后续流程自动适配置
+
+
+| output_type    | 说明                                    | 默认验证策略              |
+| -------------- | ------------------------------------- | ------------------- |
+| android-app    | Android 原生应用（Kotlin/C++ + OpenGL ES）? | 单元测试 / 集成测试         |
+| backend-api    | 后端服务/API                              | 集成测试                |
+| cli-tool       | 命令行工程                                 | 集成测试                |
+| data-pipeline  | 数据管道/ETL                              | 冒烟测试                |
+| infrastructure | 基础设施代码（Terraform/K8s）?                | 冒烟测试                |
+| documentation  | 文档/规格                                 | 人工审阅                |
+| ppt            | 演示文稿/HTML slides                      | 人工 + verify-game.sh |
+| library        | → SDK                                 | 单元测试                |
+| custom         | 自定义                                   | 用户指定                |
+
+
+## output_type → mode（fast/standard/full）正交：mode 控制流程严谨度，output_type 控制产出物和验证方式。。
 
 **顺序约束1→ *必须按序，前序未完成不得执行后序命令。。
 **顺序约束2→ * 每一小步骤之间都必须由PM进行调度，一个小步骤结束后返回给PM，由PM对输出进行检查，检查通过启动下一步。PM 在执行任何一条调度任务之前，必须打印心跳信息，格。? `[PM] xxx`
 
 **顺序约束3**：整个过程保留完整日志
+
 > **列说明*
 >
 > - **步骤ID**：workflow YAML 中的 step_id，WE 调度的最小单纯
@@ -108,55 +130,62 @@ output_type → mode（fast/standard/full）正交：mode 控制流程严谨度�
 
 ### /agh-propose
 
-| 步骤ID | 活动名称     | 执行角色 | 上游输入                                                     | 交付输出                                                     |
+
+| 步骤ID   | 活动名称         | 执行角色     | 上游输入                                                         | 交付输出                                                         |
 | ------ | ------------ | -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 步骤ID | 活动名称     | 执行角色 | 上游输入                                                     | 交付输出                                                     |
+| 步骤ID   | 活动名称         | 执行角色     | 上游输入                                                         | 交付输出                                                         |
 | ------ | ------------ | -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| BA    | 需求分析    | BA       | `reference/`<br>`specs/proposal.md`                   | `openspec/specs/{feature-name}-requirements.md`                        |
-| SA    | 架构设计     | SA       | `openspec/specs/{feature-name}-requirements.md`                        | `specs/design.md`                                  |
-| TE    | 测试用例设计 | TE       | `openspec/specs/{feature-name}-requirements.md`                        | `test/test-cases.md`                               |
-| PLAN  | 计划编排     | PM       | `specs/design.md`<br>`test/test-cases.md`                     | `specs/plan-action.md`                                |
-| SR1    | **需求评估* | PM       | `specs/design.md`<br>`specs/requirement-spec.md` | `specs/approvals/SR1-record.md`<br>`specs/baselines/` |
+| BA     | 需求分析         | BA       | `reference/` `specs/proposal.md`                             | `openspec/specs/{feature-name}-requirements.md`              |
+| SA     | 架构设计         | SA       | `openspec/specs/{feature-name}-requirements.md`              | `specs/design.md`                                            |
+| TE     | 测试用例设计       | TE       | `openspec/specs/{feature-name}-requirements.md`              | `test/test-cases.md`                                         |
+| PLAN   | 计划编排         | PM       | `specs/design.md` `test/test-cases.md`                       | `specs/plan-action.md`                                       |
+| SR1    | **需求评估*      | PM       | `specs/design.md` `specs/requirement-spec.md`                | `specs/approvals/SR1-record.md` `specs/baselines/`           |
+
 
 ---
 
 ### /agh-apply
 
 **顺序约束。?*TE进行审计，如果发现问题，将审计结果和相关日志返回给PM，PM判断审计失败，再将相关信息发给DE去修复问题，再进行下一轮审计，轮次最大次数限制在5次，如果超过5次必须上升到人工审核心。
-| 步骤ID | 活动名称     | 执行角色           | 上游输入                                                     | 交付输出                                                     |
+
+
+| 步骤ID   | 活动名称         | 执行角色               | 上游输入                                                         | 交付输出                                                         |
 | ------ | ------------ | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 步骤ID | 活动名称     | 执行角色           | 上游输入                                                     | 交付输出                                                     |
+| 步骤ID   | 活动名称         | 执行角色               | 上游输入                                                         | 交付输出                                                         |
 | ------ | ------------ | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| DEV-1  | 编码实现     | DE                 | `specs/design.md`                                  | `output/`<br/>`specs/de-reports/code-report.md` |
-| TEST-1 | 审计验证     | TE                 | `output/`                         | `test/temp-test-report.md`                        |
-| SR2    | **功能评审** | PM（人机交互决策） | `output/`<br>`test/temp-test-report.md` | `specs/approvals/SR2-record.md`                                 |
-| TEST-2 | 审计验证     | TE                 | `output/`                         | `test/final-test-report.md`                       |
-| SR3    | **功能评审** | PM（人机交互决策） | `output/`<br>`test/final-test-report.md` | `specs/approvals/SR3-record.md`                                 |
+| DEV-1  | 编码实现         | DE                 | `specs/design.md`                                            | `output/` `specs/de-reports/code-report.md`                  |
+| TEST-1 | 审计验证         | TE                 | `output/`                                                    | `test/temp-test-report.md`                                   |
+| SR2    | **功能评审**     | PM（人机交互决策）         | `output/` `test/temp-test-report.md`                         | `specs/approvals/SR2-record.md`                              |
+| TEST-2 | 审计验证         | TE                 | `output/`                                                    | `test/final-test-report.md`                                  |
+| SR3    | **功能评审**     | PM（人机交互决策）         | `output/` `test/final-test-report.md`                        | `specs/approvals/SR3-record.md`                              |
+
 
 ---
 
 ### /agh-archive
 
-| 步骤ID | 活动名称         | 执行角色           | 上游输入                              | 交付输出                   |
-| ------ | ---------------- | ------------------ | ------------------------------------- | -------------------------- |
-| 步骤ID | 活动名称         | 执行角色           | 上游输入                              | 交付输出                   |
-| ------ | ---------------- | ------------------ | ------------------------------------- | -------------------------- |
-| ARC-1  | 规格基线归档     | PM                 | `specs/` | `specs/baselines/` |
-| ARC-2  | 测试报告归档     | PM                 | `test/final-test-report.md`           | `specs/baselines/`           |
-| ARC-3  | 产出物最终确认  | PM                 | `output/`        | →           |
-| SR4    | **项目结项确认** | PM（人机交互决策） |                                       | `specs/approvals/SR4-record.md` |
+
+| 步骤ID   | 活动名称             | 执行角色               | 上游输入                                  | 交付输出                            |
+| ------ | ---------------- | ------------------ | ------------------------------------- | ------------------------------- |
+| 步骤ID   | 活动名称             | 执行角色               | 上游输入                                  | 交付输出                            |
+| ------ | ---------------- | ------------------ | ------------------------------------- | --------------------------      |
+| ARC-1  | 规格基线归档           | PM                 | `specs/`                              | `specs/baselines/`              |
+| ARC-2  | 测试报告归档           | PM                 | `test/final-test-report.md`           | `specs/baselines/`              |
+| ARC-3  | 产出物最终确认          | PM                 | `output/`                             | →                               |
+| SR4    | **项目结项确认**       | PM（人机交互决策）         |                                       | `specs/approvals/SR4-record.md` |
+
 
 ---
-
-
 
 ## 4、运行环境与使用方式
 
 ### 支持平台
+
 - Claude Code CLI（终端）
 - VSCode Cline 插件
 - VSCode Claude Code 插件对话。。
-三个平台共享同一套核心逻辑，通过 `CLAUDE.md`（Claude Code）? `.clinerules`（Cline）实现规则同源，`.mcp.json` 统一 MCP 配置。。
+  三个平台共享同一套核心逻辑，通过 `CLAUDE.md`（Claude Code）? `.clinerules`（Cline）实现规则同源，`.mcp.json` 统一 MCP 配置。。
+
 ### 前置准备
 
 1. **环境要求**：Node.js 18+、npm
@@ -166,67 +195,91 @@ output_type → mode（fast/standard/full）正交：mode 控制流程严谨度�
 
 **Step 1: 需求初始化与澄清*
 
-在对话框输入。?```
-/agh-clarify
+在对话框输入：
 ```
 
-系统行为。?- 自动检测场景：
-  - **NEW**：无历史需求，全新项目
-  - **RESUME**：检测到未完成的 REQ，提示用户继续或放弃
-  - **CHANGE**：有已完成的历史需求，进入变更模式（自动备份基线）
-- NEW/CHANGE 模式：创建新 REQ-ID 目录，进入需求澄清- 变更模式下仅讨论变更点，不重复已有内部?- PM 逐轮提问（每轮≤3题），生效?Proposal 草稿供确认- 用户确认通过后，Proposal 定稿
+/agh-clarify
+
+```
+
+系统行为：
+- 自动检测场景：
+    - **NEW**：无历史需求，全新项目
+    - **RESUME**：检测到未完成的 REQ，提示用户继续或放弃
+    - **CHANGE**：有已完成的历史需求，进入变更模式（自动备份基线）
+- NEW/CHANGE 模式：创建新 REQ-ID 目录，进入需求澄清- 变更模式下仅讨论变更点，不重复已有内部
+- PM 逐轮提问（每轮≤3题），生效 Proposal 草稿供确认
+- 用户确认通过后，Proposal 定稿
 
 **Step 2: 需求分析与方案设计**
 
-在对话框输入。?```
+在对话框输入：
+```
 /agh-propose
+
 ```
 
-系统行为。?- BA 执行需求分析，生成结构化需求文件- SA 执行架构设计，生成技术方案- TE 设计测试用例
-- PM 进行后续任务编排，生成任务列表?- PM 汇总后呈现人工审批（SR1）?- 用户审批通过后进入下一阶段；驳回则回退修改
+系统行为：
+- BA 执行需求分析，生成结构化需求文件
+- SA 执行架构设计，生成技术方案
+- TE 设计测试用例
+- PM 进行后续任务编排，生成任务列表
+- PM 汇总后呈现人工审批（SR1）
+- 用户审批通过后进入下一阶段；驳回则回退修改
 
 **Step 3: 开发与审计**
 
-在对话框输入。?```
+在对话框输入：
+```
+
 /agh-apply
+
 ```
 
 系统行为。?- 逐任务循环开发（DE 编码 ）?TE 审计 → 人工检查确认，最。?轮修复）
 - 所有开发审计+人工检查完成后，统一进行 SR2 正式审批
 - SR2 通过期?DE 合并到最终产物，TE 最终审批- 最终审计通过后呈现?SR3 人工审批
 - 支持断点续作：中断后重新输入 `/agh-apply` 自动跳过已完成任务
-**Step 4: 归档结项**
+  **Step 4: 归档结项**
 
-在对话框输入。?```
-/agh-archive
+在对话框输入：
 ```
 
-系统行为。?- 检测归档模式：
-- **首次归档**（`specs/baselines/` 为空）：直接创建基线快照
-- **变更归档**（`specs/baselines/` 已有文件）：将变更内部?merge 到现有基线文件- 将代码归档到 output/
-- 呈现归档摘要供用户确认结项（SR4）。
-**查看最终成熟?*
+/agh-archive
 
-归档完成后，最终产物位。?`output/` 目录。。
+```
+
+系统行为：
+检测归档模式：
+- **首次归档** （`specs/baselines/` 为空）：直接创建基线快照
+- **变更归档** （`specs/baselines/` 已有文件）：将变更内部 merge 到现有基线文件- 将代码归档到 output/
+- 呈现归档摘要供用户确认结项（SR4）。
+- **查看最终成品**
+  归档完成后，最终产物位。?`output/` 目录。。
+
 ### 用户触发方式
 
 用户在对话框中输入斜杠命令触发流程，Agent 自动识别并按对应 Skill 执行
-| 命令 | 触发行为 |
-|------|---------|
-| `/agh-clarify` | 场景检测（NEW/RESUME/CHANGE）? 环境预检 + 需求澄清+ 产出类型选择 + 模式选择 |
-| `/agh-propose` | 前置检查找?SA需求分析+ 架构设计 → TE测试用例 → PM任务编排 → 人工评审 |
-| `/agh-apply` | 前置检查找?DE开发芽?TE审计（test_strategy 驱动）→ 逐任务人工检查找?SR2 → SR3 |
-| `/agh-archive` | 前置检查找?产物归档（output_type 感知，首次copy/变更merge）→ 用户确认结项 |
-| `/agh-android-game` | SnakeShot 游戏特性开发快捷入口，自动检查C++/Gradle 技术栈并进入主流程 |
-| `/agh-run` | 全流程自动推进（clarify ）?propose → apply → archive，阶段间自动衔接口|
+
+
+| 命令                  | 触发行为                                                   |
+| ------------------- | ------------------------------------------------------ |
+| `/agh-clarify`      | 场景检测（NEW/RESUME/CHANGE）? 环境预检 + 需求澄清+ 产出类型选择 + 模式选择    |
+| `/agh-propose`      | 前置检查找?SA需求分析+ 架构设计 → TE测试用例 → PM任务编排 → 人工评审            |
+| `/agh-apply`        | 前置检查找?DE开发芽?TE审计（test_strategy 驱动）→ 逐任务人工检查找?SR2 → SR3 |
+| `/agh-archive`      | 前置检查找?产物归档（output_type 感知，首次copy/变更merge）→ 用户确认结项      |
+| `/agh-android-game` | SnakeShot 游戏特性开发快捷入口，自动检查C++/Gradle 技术栈并进入主流程          |
+| `/agh-run`          | 全流程自动推进（clarify ）?propose → apply → archive，阶段间自动衔接口   |
+
 
 ### 内置工具
 
-| 工具 | 用户| 调用时机 |
-|------|------|---------|
-| WebSearch | 联网搜索补充资料 | SA 研究阶段 |
-| WebFetch | 网页内容抓取 | 用户提供参考链接时 |
-| Read | 图片内容识别 | reference/ 含图片时 |
+
+| 工具        | 用户       | 调用时机            |
+| --------- | -------- | --------------- |
+| WebSearch | 联网搜索补充资料 | SA 研究阶段         |
+| WebFetch  | 网页内容抓取   | 用户提供参考链接时       |
+| Read      | 图片内容识别   | reference/ 含图片时 |
 
 
 ---

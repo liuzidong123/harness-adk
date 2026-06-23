@@ -10,6 +10,7 @@
 
 #include "Model.h"
 #include "Shader.h"
+#include "AudioEngine.h"
 
 struct android_app;
 
@@ -109,6 +110,14 @@ private:
     std::shared_ptr<TextureAsset> spSnakeBodyTex_;
     std::shared_ptr<TextureAsset> spSnakeFoodTex_;
     std::shared_ptr<TextureAsset> spGridBgTex_;
+
+    // Audio
+    std::unique_ptr<AudioEngine> audioEngine_;
+
+    // Score
+    int score_;
+    std::unique_ptr<Model> scoreModel_;
+    void updateScoreLabel();
 
     // Timing
     std::chrono::steady_clock::time_point lastFrameTime_;

@@ -15,6 +15,7 @@ if(NOT BUILD_TESTS)
     add_library(snakeshot SHARED
             main.cpp
             AndroidOut.cpp
+            AudioEngine.cpp
             Renderer.cpp
             Shader.cpp
             TextureAsset.cpp
@@ -50,4 +51,14 @@ else()
     target_include_directories(test_button_menu PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
     target_compile_features(test_button_menu PUBLIC cxx_std_17)
     add_test(NAME button_menu COMMAND test_button_menu)
+    add_executable(test_audio_sfx ../../test/cpp/test_audio_sfx.cpp)
+    target_link_libraries(test_audio_sfx gtest gtest_main)
+    target_include_directories(test_audio_sfx PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_compile_features(test_audio_sfx PUBLIC cxx_std_17)
+    add_test(NAME audio_sfx COMMAND test_audio_sfx)
+    add_executable(test_scoring ../../test/cpp/test_scoring.cpp)
+    target_link_libraries(test_scoring gtest gtest_main)
+    target_include_directories(test_scoring PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_compile_features(test_scoring PUBLIC cxx_std_17)
+    add_test(NAME scoring COMMAND test_scoring)
 endif()

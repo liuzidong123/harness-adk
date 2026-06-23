@@ -67,7 +67,7 @@
 - **SA** → OpenSpec 格式设计方案，含 Task 清单 + 需求↔Task↔验证追溯- **DE** → OpenSpec 格式代码报告，含 Task↔文件↔测试追溯
 - **TE** → OpenSpec 格式测试用例 + 测试报告，含 TC↔需求↔Task 追溯
 - **UX** → OpenSpec 格式设计规格，含设计元素↔需求追溯
-各角色输出目录下设drafts/（草稿）、specs/（定稿）、changes/（变更）三个子目录构建OpenSpec 工作流程PM 调度时根据 选择 openspec_strategy：fast→direct, standard/full→review, CHANGE→change
+  各角色输出目录下设drafts/（草稿）、specs/（定稿）、changes/（变更）三个子目录构建OpenSpec 工作流程PM 调度时根据 选择 openspec_strategy：fast→direct, standard/full→review, CHANGE→change
 ---
 
 ## 8. 产出类型体系（output_type）
