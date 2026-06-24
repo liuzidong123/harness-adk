@@ -263,12 +263,12 @@ Rule设定约束 --> Skill标准化执行--> Agent角色制衡 --> Script硬性�
 
 | 命令                  | 触发行为                                                   |
 | ------------------- | ------------------------------------------------------ |
-| `/agh-clarify`      | 场景检测（NEW/RESUME/CHANGE）? 环境预检 + 需求澄清+ 产出类型选择 + 模式选择    |
+| `/agh-clarify`      | 场景检测（NEW/RESUME/CHANGE）环境预检 + 需求澄清+ 产出类型选择 + 模式选择    |
 | `/agh-propose`      | 前置检查找?SA需求分析+ 架构设计 → TE测试用例 → PM任务编排 → 人工评审            |
 | `/agh-apply`        | 前置检查找?DE开发芽?TE审计（test_strategy 驱动）→ 逐任务人工检查找?SR2 → SR3 |
 | `/agh-archive`      | 前置检查找?产物归档（output_type 感知，首次copy/变更merge）→ 用户确认结项      |
-| `/agh-android-game` | SnakeShot 游戏特性开发快捷入口，自动检查C++/Gradle 技术栈并进入主流程          |
-| `/agh-run`          | 全流程自动推进（clarify ）?propose → apply → archive，阶段间自动衔接口   |
+| `/agh-android-game` | 安卓游戏特性开发快捷入口，自动检查C++/Gradle 技术栈并进入主流程          |
+| `/agh-run`          | 全流程自动推进（clarify → propose → apply → archive，阶段间自动衔接口   |
 
 
 ### 内置工具
