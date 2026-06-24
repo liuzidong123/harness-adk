@@ -137,6 +137,33 @@ check_b() {
             echo "PASS: output/ 非空"
         fi
 
+        # openspec/specs/ 检查（所有 mode 必须）
+        if [ -n "$feature_name" ]; then
+            local openspec_spec="openspec/specs/${feature_name}-spec.md"
+            if [ ! -s "$openspec_spec" ]; then
+                echo "FAIL: $openspec_spec 缺失或为空"
+                ERRORS=$((ERRORS + 1))
+            else
+                echo "PASS: $openspec_spec"
+            fi
+            if [ ! -s "openspec/specs/test-cases-spec.md" ]; then
+                echo "FAIL: openspec/specs/test-cases-spec.md 缺失或为空"
+                ERRORS=$((ERRORS + 1))
+            else
+                echo "PASS: openspec/specs/test-cases-spec.md"
+            fi
+        fi
+
+        # 单元测试文件检查（所有 mode 必须）
+        local test_file_safe="${feature_name//-/_}"
+        local test_file="app/src/test/cpp/test_${test_file_safe}.cpp"
+        if [ ! -s "$test_file" ]; then
+            echo "FAIL: $test_file 缺失或为空（spec SHALL 对应的 GTest 文件必须生成）"
+            ERRORS=$((ERRORS + 1))
+        else
+            echo "PASS: $test_file"
+        fi
+
         # output_type-specific checks
         case "$output_type" in
             ppt)

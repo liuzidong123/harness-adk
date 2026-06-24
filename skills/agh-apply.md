@@ -73,18 +73,60 @@ DE 一次性开发所有任务 → TE 轻量审计 → 人工确认（唯一审�
   请确认 通过 / 驳回（请说明原因）
   ```
 3. 用户通过:
-- **生成/更新 Spec 文档到 `openspec/specs/`**:
-    - `openspec/specs/{feature-name}-spec.md`（含 SHALL + GWT + 追溯矩阵 + 技术图表）
-    - `openspec/specs/test-cases-spec.md`（增量更新测试用例规格）
-    - **图表要求（必须）**: Spec 文档必须包含以下 Mermaid 图表，基于实际代码生成：
-        - 框架图（flowchart/graph）: 展示模块/组件间关系
-        - 逻辑流程图（flowchart）: 展示核心业务逻辑分支
-        - 类图（classDiagram）: 展示新增/修改的类、成员变量、方法
-        - 时序图（sequenceDiagram）: 展示关键交互流程
 - 更新 `.state.md`: sr_status.SR2=skipped, sr_status.SR3=approved, phase=apply, current_step=SR3-DONE
-- `[PM] 确认通过（fast模式），可执行/agh-archive`
+- `[PM] 确认通过，进入 Spec 生成步骤`
 4. 用户驳回:
 - 记录原因，回退 DE 修复
+
+**Step 4: Spec 文档生成（PM 强制执行）**
+
+1. `[PM] 强制生成 Spec 文档到 openspec/specs/`
+
+2. **必须生成以下文件**（无论 mode 类型，此为 PM 不可跳过职责）：
+
+   a. `openspec/specs/{feature-name}-spec.md` — 包含：
+      - SHALL + GWT 格式需求规格
+      - Mermaid 图表（必须，基于实际代码）：
+        - 框架图（flowchart/graph）：模块/组件间关系
+        - 逻辑流程图（flowchart）：核心业务逻辑分支
+        - 类图（classDiagram）：新增/修改的类、成员变量、方法
+        - 时序图（sequenceDiagram）：关键交互流程
+      - 追溯矩阵（SHALL → 实现 → 测试用例映射）
+      - 版本号和变更历史
+
+    b. `openspec/specs/test-cases-spec.md` — **必须增量更新（每次 Step 4 都必做，不可跳过）**：
+       - 追加新测试用例（TC-ID、场景、操作、期望）
+       - TC-ID 必须与 `test_{feature-name}.cpp` 中的 `TEST()` 用例一一对应
+       - 追加 SHALL → 测试用例映射到追溯矩阵
+       - 更新版本号和变更历史
+
+    c. **`app/src/test/cpp/test_{feature-name}.cpp` — 单元测试文件**（必须，PM 不可跳过）：
+       - 从 spec 的 SHALL 语句逐条翻译成 GTest 测试用例（至少覆盖所有 functional SHALL）
+       - 遵循已有测试模式（参考 `app/src/test/cpp/test_button_menu.cpp`）：
+         - 使用 `TEST(SuiteName, TestName)` 宏
+         - JNI 依赖的部分用内存模拟或 spy 模式隔离
+         - 逻辑/状态机映射用纯 C++ 函数测试，不依赖 Android 环境
+       - 同步更新 `app/src/main/cpp/CMakeLists.txt`：
+         - 在 `else()` 块中添加 `add_executable(test_{feature-name} ...)` + `target_link_libraries` + `target_include_directories` + `target_compile_features` + `add_test`
+         - 遵循 `test_button_menu` 的 NDK GTest 路径配置
+       - **验证编译**：运行 `cmake -DBUILD_TESTS=ON .. && cmake --build . --target test_{feature-name}`（或确认编译目标已配置）
+       - **同时必须更新 `openspec/specs/test-cases-spec.md`（见上方 b）**：将此文件中每个 `TEST()` 用例以 TC-ID 形式追加到 test-cases-spec.md
+
+3. **强制校验**：
+   ```
+   [PM] 校验 Spec 文件
+   检查 openspec/specs/{feature-name}-spec.md → 存在且非空
+   检查 openspec/specs/test-cases-spec.md → 存在且非空
+   检查 test-cases-spec.md 包含新 TC-ID 条目
+   检查 spec 文件包含 Mermaid 图表
+   检查 app/src/test/cpp/test_{feature-name}.cpp → 存在且非空（覆盖所有 functional SHALL）
+   检查 app/src/main/cpp/CMakeLists.txt → 包含 test_{feature-name} 构建目标
+   ```
+   - 6 项全部通过 → `[PM] Spec 文档 + 单元测试生成验证通过`
+   - 任何一项失败 → PM 必须修复补充，不可跳过
+
+4. 更新 `.state.md`: `completed_steps` 追加 SPEC-GENERATED
+5. `[PM] Spec 文档就绪，可执行 /agh-archive`
 
 ---
 
@@ -204,18 +246,20 @@ END FOR
   ```
 
 4. 通过:
-- **生成/更新 Spec 文档到 `openspec/specs/`**:
-    - `openspec/specs/{feature-name}-spec.md`（含 SHALL + GWT + 追溯矩阵 + 技术图表）
-    - `openspec/specs/test-cases-spec.md`（增量更新测试用例规格）
-    - **图表要求（必须）**: Spec 文档必须包含以下 Mermaid 图表，基于实际代码生成：
-        - 框架图（flowchart/graph）: 展示模块/组件间关系
-        - 逻辑流程图（flowchart）: 展示核心业务逻辑分支
-        - 类图（classDiagram）: 展示新增/修改的类、成员变量、方法
-        - 时序图（sequenceDiagram）: 展示关键交互流程
 - 写入 `output/{feature-name}/approvals/SR3-record.md`
 - 更新 `.state.md`: sr_status.SR3=approved, phase=apply, current_step=SR3-DONE, completed_steps 追加 TEST-2 + SR3-DONE
-- `[PM] SR3 通过，可执行 /agh-archive`
+- `[PM] SR3 通过，进入 Spec 生成步骤`
 5. 驳回: 记录原因，回退修复
+
+**Step 5: Spec 文档生成（PM 强制执行，SR3 通过后不可跳过）**
+
+同 fast 模式 Step 4 规范：
+1. `[PM] 强制生成 Spec 文档到 openspec/specs/`
+2. 生成 `openspec/specs/{feature-name}-spec.md`（SHALL + GWT + 追溯矩阵 + 4 种 Mermaid 图表）
+3. 增量更新 `openspec/specs/test-cases-spec.md`（追加 TC-ID、追溯矩阵、版本号）
+4. 强制校验：两个文件存在且非空 + test-cases 含新 TC-ID + spec 含图表
+5. 更新 `.state.md`: `completed_steps` 追加 SPEC-GENERATED
+6. `[PM] Spec 文档就绪，可执行 /agh-archive`
 
 ---
 

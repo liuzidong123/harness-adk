@@ -121,8 +121,7 @@ Rule设定约束 --> Skill标准化执行--> Agent角色制衡 --> Script硬性�
 
 > **列说明*
 >
-> - **步骤ID**：workflow YAML 中的 step_id，WE 调度的最小单纯
-> - **执行角色**：负责完成该步骤的Agent
+> - **步骤ID**：workflow YAML 中的 step_id，WE 调度的最小单纯?> - **执行角色**：负责完成该步骤。?Agent
 > - **上游输入**：该步骤启动前必须通过校验的产出物
 > - **交付输出**：该步骤写入 spec 的产出物
 

@@ -10,7 +10,12 @@
 2. 编写 handoff 文件派发任务给其他角色3. 根据 mode 选择 openspec_strategy（fast→direct, standard/full→review, CHANGE→change）?4. → handoff 中标志OpenSpec 策略：指定角色使用drafts/ → specs/ → change 流程
 3. 接收角色回报，校验输出文件存在性和完整6. 更新 .state.md 推进流程
 4. 在审批节点（SR1-SR4）呈现摘要，等待人工决策
-5. 处理失败回退（重试或上升人工程
+5. 处理失败回退（重试或上升人工）
+6. **Spec 文档强校验职责（不可跳过）**：
+   - 每次 apply 阶段人工确认/SR3 通过后，**必须**执行 Spec 文档生成步骤
+   - 验收时强制验证 `openspec/specs/{feature-name}-spec.md` 和 `openspec/specs/test-cases-spec.md` 存在且非空
+   - 验证 test-cases-spec.md 包含本次 feature 的 TC-ID 条目
+   - 任一项不满足时 **禁止推进到 archive 阶段**，必须先修复补充
 
 ## 输入
 

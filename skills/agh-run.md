@@ -41,7 +41,7 @@
 | ------------------------- | ------------------------------------------------------------ |
 | current_step=INIT-DONE    | 自动推进 → propose（无暂停止                                          |
 | current_step=PROPOSE-DONE | 自动推进 → apply（无暂停，跳）?SR1→                                     |
-| Apply 人工确认通过              | 自动推进 → archive（无暂停，跳）?SR4），重置 repair_round=0, repair_task="" |
+| completed_steps 包含 SPEC-GENERATED | 自动推进 → archive（无暂停，跳过 SR4），重置 repair_round=0, repair_task="" |
 | phase=done                | 打印最终摘要                                                       |
 
 
@@ -84,7 +84,8 @@ PM 恢复时检查`.state.md` → `auto_advance: true`→
 
 1. 读取 skills/agh-apply.md，按其定义执行全部步骤
 2. 所有人工审批节点（逐任务确认、SR2、SR3）照常暂停等待用户
-3. 到达 SR3-DONE 后：`[PM] → apply 完成，自动推荐 archive`
+3. 阅读 skills/agh-apply.md 中 Step 4（Spec 文档生成），执行 Spec 生成+校验
+4. 到达 completed_steps 包含 SPEC-GENERATED 后：`[PM] → apply 完成（含 Spec 文档就绪），自动推荐 archive`
 
 ### Phase 4: Archive
 

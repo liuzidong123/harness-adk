@@ -10,6 +10,12 @@
 1. 读取 `.state.md` 获取当前 req_id → sr_status.SR3
 2. 验证 sr_status.SR3=approved（standard/full）或 sr_status.SR3=approved（fast，在apply中已设置）
 3. 验证 `output/{feature-name}` 存在且非空. 不满足则阻塞，提示用户先完成 /agh-apply
+4. **Spec 文件强制检查（阻断条件）**:
+   - 检查 `openspec/specs/{feature-name}-spec.md` 存在且非空
+   - 检查 `openspec/specs/test-cases-spec.md` 存在且非空
+   - 检查 test-cases-spec.md 包含新 feature 的 TC-ID 条目
+   - 如任一项不满足 → `[PM] ⛔ 阻断: openspec/specs/ 缺少必要 Spec 文件，需先执行 apply 阶段 Step 4 Spec 文档生成步骤`
+   - PM 不得跳过此检查，必须生成/补充 Spec 文件后方可继续归档
 
 ## 归档模式检查
 
