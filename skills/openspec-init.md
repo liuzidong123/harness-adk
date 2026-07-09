@@ -121,13 +121,15 @@ openspec validate --all --json
 Android Game Harness 角色制品牌?OpenSpec 命名约定义
 
 
-| 角色  | OpenSpec change 命名 | 对应 Android Game Harness 产物         |
-| --- | ------------------ | ---------------------------------- |
-| BA  | `requirement-spec` | ba/drafts/requirement-spec-v{N}.md |
-| SA  | `design-{feature}` | sa/drafts/design-v{N}.md           |
-| DE  | `code-task-{N}`    | de/drafts/code-report-v{N}.md      |
-| TE  | `test-{feature}`   | te/drafts/test-cases-v{N}.md       |
-| UX  | `ux-{feature}`     | ux/drafts/ux-design-v{N}.md        |
+| 角色  | OpenSpec change 命名 | 对应 Android Game Harness 产物         | 数据操作 Skill |
+| --- | ------------------ | ---------------------------------- | ------------- |
+| BA  | `requirement-spec` | ba/drafts/requirement-spec-v{N}.md | SpecService + FeatureService + KnowledgeService |
+| SA  | `design-{feature}` | sa/drafts/design-v{N}.md           | SpecService + FeatureService + KnowledgeService + CodeGraphService |
+| DE  | `code-task-{N}`    | de/drafts/code-report-v{N}.md      | FeatureService + SpecService + KnowledgeService + CodeGraphService |
+| TE  | `test-{feature}`   | te/drafts/test-cases-v{N}.md       | FeatureService + KnowledgeService + CodeGraphService |
+| UX  | `ux-{feature}`     | ux/drafts/ux-design-v{N}.md        | KnowledgeService + SpecService |
+
+> **说明**：OpenSpec CLI 作为版本化持久层，数据操作 Skill（FeatureService/SpecService/KnowledgeService/CodeGraphService）的读写最终通过 `openspec change/spec/archive` 命令落地和追溯。
 
 
 ---

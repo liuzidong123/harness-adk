@@ -1,6 +1,7 @@
 # Skill: agh-openspec
 
-通用制品版本管理（OpenSpec 协议）。各角色通过本协议管理其产出物的版本、追溯和变更历史。可通过 `/agh-openspec` 快捷触发 OpenSpec 工作流程
+通用制品版本管理（OpenSpec 协议）。各角色通过本协议管理其产出物的版本、追溯和变更历史。可通过 `/agh-openspec` 快捷触发 OpenSpec 工作流程。
+OpenSpec 是数据操作 Skill（FeatureService/SpecService/KnowledgeService/CodeGraphService）的版本化持久层协议：Spec 制品由 SpecService 读写，Feature 配置由 FeatureService 管理，Knowledge 条目由 KnowledgeService（LLM Wiki + 关系图谱）沉淀，代码图谱由 CodeGraphService 增量维护。
 *底层实现。 `@fission-ai/openspec` npm 包（`openspec` CLI），通过 `skills/openspec-init.md` 使用日志规则* → `templates/logging-standard.md`
 
 ---
@@ -85,6 +86,21 @@ spec_name: {feature-name}
 |------|------|---------|------|
 | v1 | YYYY-MM-DD | 初始版本 | {role} |
 ```
+
+### 动态同步与版本化追溯
+
+OpenSpec 变更通过事件总线（Event Bus）驱动 Feature/Spec/Knowledge 三者的自动同步：
+
+| 触发器 | 同步动作 | 目标 |
+|--------|----------|------|
+| **Spec 新增** | 提取标准条款 → 生成 Knowledge 条目 | KnowledgeService |
+| **Spec 修改** | 重新提取关联 Knowledge → 版本对比 → 人工确认差异 | KnowledgeService |
+| **Feature 创建** | 查询 Knowledge → 自动注入关联规则 | FeatureService + Spec |
+| **Feature 修改** | 重新校验所有关联 Knowledge 约束 | KnowledgeService |
+| **Knowledge 新增** | 扫描全量 Feature → 检查新增约束 | FeatureService |
+| **冲突解决沉淀** | 将解决方案写入 Knowledge + 标记来源 | KnowledgeService |
+
+每条同步记录含 `event_id / source_version / target_version / action / diff_hash / consistency_status / timestamp`。每次同步完成生成一致性快照 `{Spec version}_{Feature snapshot}_{Knowledge version}.snap`，支持 git-like checkout 回溯。
 
 ---
 

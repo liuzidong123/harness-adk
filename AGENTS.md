@@ -19,11 +19,18 @@ Sequence is strict: clarify → propose → apply → archive. No skipping.
 
 ## Architecture
 
-- **Roles**: PM (scheduler), BA (requirements), SA (design), DE (TDD dev), TE (audit), UX (visual/structure)
-- **Role isolation**: info passes through PM via handoff files only; non-PM roles never reference other roles' reasoning
+- **Paradigm**: Agent orchestrates Skill → Skill drives data-operation Skill → data-operation Skill reads/writes data layer (see `feature_spec_knowledge.md`)
+- **Roles (agents)**: PM (scheduler + dynamic-sync), BA (requirements), SA (design), DE (TDD dev + 3-phase Code-Review), TE (black-box + white-box test), UX (visual/structure)
+- **Data-operation Skills** (data layer access, shared by all executing roles):
+  - `FeatureService` — Feature config (switch/param/dependency/scope/lifecycle, Android SystemFeatures)
+  - `SpecService` — Spec requirement read/write (bidirectional transform with Knowledge)
+  - `KnowledgeService` — domain knowledge; Hybrid = LLM Wiki (semantic) + Relation Graph (deterministic), 3-tier cache (L1 hot / L2 context / L3 persist)
+  - `CodeGraphService` — code structure; L1 static index (Clang AST/CG/CFG/#ifdef) + L2 LLM semantic + L3 incremental
+- **Role isolation**: info passes through PM via handoff files only; non-PM roles never reference other roles' reasoning; executing roles never touch data layer directly (must go through data-operation Skills)
 - **Two platform modes**: Claude Code (SubAgent for physical isolation) vs Cline (file protocol + explicit role switching)
 - **State**: `.state.md` (single source of truth, schema in `templates/state-template.md`)
 - **Process log**: `log/process.log`, format `[{timestamp}] [{role}] {event}`
+- **Dynamic sync**: Feature/Spec/Knowledge sync via Event Bus; versioned changelog + consistency snapshots (`{Spec}_{Feature}_{Knowledge}.snap`)
 
 ## Key files
 
@@ -50,11 +57,13 @@ Verify check types: A=file existence, B=phase+output_type-aware completeness, C=
 
 ## DE dev cycle (mandatory)
 
-1. TDD: write failing test → implement → refactor
-2. Run `skills/dev-test.md` (routes by tech_stack.language: test → lint → build)
-3. Run `skills/post-verify.md` (`verify.sh A` + handoff output check + no-scope-creep check)
-4. DE self-repair cap: 3 internal attempts before reporting to PM
-5. PM-level repair loop: max 5 rounds, tracked in `.state.md` `repair_round`
+1. TDD: **R1 Pre-Review** → red (black-box test fails) → green + **R2 Implementation Review** → white-box → refactor + **R3 Refactoring Review**
+2. Three-phase Code-Review is mandatory: R1 (before red), R2 (after green), R3 (during refactor) — recorded in code-report.md
+3. Run `skills/dev-test.md` (routes by tech_stack.language: black-box 100% + white-box ≥80% → lint → build)
+4. Run `skills/post-verify.md` (`verify.sh A` + handoff output check + 3-phase review check + no-scope-creep check)
+5. Data access only via `FeatureService/SpecService/KnowledgeService/CodeGraphService`
+6. DE self-repair cap: 3 internal attempts (each re-runs TDD cycle incl. R2/R3) before reporting to PM
+7. PM-level repair loop: max 5 rounds, tracked in `.state.md` `repair_round`
 
 ## TE audit (driven by test_strategy)
 

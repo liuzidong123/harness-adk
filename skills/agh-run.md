@@ -1,6 +1,6 @@
 # Skill: agh-run
 
-**全流程自动推进模式** PM 主导，一次性执行clarify → propose → apply → archive 全部阶段，仅在人工审批节点暂停止
+**全流程自动推进模式** PM 主导，一次性执行clarify → propose → apply → archive 全部阶段，仅在人工审批节点暂停止。各 Agent 编排业务 Skill，Skill 通过数据操作 Skill（FeatureService/SpecService/KnowledgeService/CodeGraphService）访问数据层；apply 阶段 DE 遵循 TDD 循环（R1 → 红 → 绿 + R2 → 白盒 → 重构 + R3）。
 **日志规则** 同各阶段 skill 定义，追加日志到 `log/process.log`
 
 ## 核心规则：自动推荐

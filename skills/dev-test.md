@@ -1,84 +1,82 @@
 # Skill: dev-test
 
-DE 开发自测标准操作规程。编码完成后、提交回报前必须执行
-**日志规则* → `templates/logging-standard.md`
+DE 开发自测标准操作规程。编码完成后、提交回报前必须执行。此步在 TDD 循环的绿阶段（R2 通过后）和重构阶段（R3）之间执行，验证黑盒/白盒测试与构建。
+**日志规则** → `templates/logging-standard.md`
 
 ---
 
 ## 触发时机
 
-DE 完成编码实现后，在填写-report.md 之前执行
+DE 完成编码实现（绿阶段 + R2 Implementation Review 通过后），在填写 code-report.md 之前执行。
+
 ## 前置: 读取技术栈信息
 
 1. 读取 `.state.md` → tech_stack、test_strategy、output_type 字段
 2. 根据 tech_stack.language 确定命令路由
 
-## Step 1: 测试执行
+## Step 1: 测试执行（黑盒 + 白盒）
 
-根据 tech_stack.language 路由测试命令。。
-| language | 检测方式| 默认命令 |
+根据 tech_stack.language 路由测试命令。
+
+| language | 检测方式 | 默认命令 |
 |----------|---------|---------|
 | javascript | package.json scripts.test | npm test / yarn test / pnpm test |
 | python | pytest.ini / pyproject.toml | pytest / python -m pytest |
 | go | go.mod | go test ./... |
 | rust | Cargo.toml | cargo test |
 | java | pom.xml / build.gradle | mvn test / gradle test |
-| unknown | .state.md tech_stack.test_framework | 读取用户指定的命令|
+| unknown | .state.md tech_stack.test_framework | 用户指定命令 |
 
-跳过条件。?- test_strategy=none → test_strategy=manual: 跳过此步，记录"测试跳过（test_strategy={value}）。
+测试分类执行：
+- **黑盒测试**（红阶段生成）：验证输入→输出符合 Spec，通过率必须 100%
+- **白盒测试**（白盒阶段生成）：验证分支/路径/条件覆盖，覆盖率 ≥ 80%
 
-执行后记录结果：通过期?/ 失败。?/ 跳过数。如有失败：修复代码，重新运行业。
+跳过条件：test_strategy=none / manual → 跳过此步，记录原因。
+
+执行后记录：黑盒通过数 / 白盒覆盖率 / 失败数。如有失败：修复代码，重新运行。
+
 ## Step 2: Lint 检查
-根据 tech_stack.language 路由 lint 命令。。
-| language | 检测方式| 默认命令 |
-|----------|---------|---------|
-| javascript | .eslintrc* / biome.json / package.json | npx eslint . / npx prettier --check . |
-| python | ruff.toml / pyproject.toml [tool.ruff] | ruff check . / black --check . |
-| go | .golangci.yml | golangci-lint run |
-| rust | (内置) | cargo clippy -- -D warnings |
-| java | checkstyle.xml | mvn checkstyle:check |
-| unknown | .state.md tech_stack.lint_tool | 读取用户指定的命令；如无则跳。?|
 
-自动修复可修复项，不可自动修复的手动修复杂。
+根据 tech_stack.language 路由 lint 命令。自动修复可修复项。
+
 ## Step 3: 构建验证
 
-根据 tech_stack.language 路由构建命令。。
-| language | 检测方式| 默认命令 |
-|----------|---------|---------|
-| javascript | package.json scripts.build | npm run build |
-| python | pyproject.toml [build-system] | python -m build / pip install -e . |
-| go | go.mod | go build ./... |
-| rust | Cargo.toml | cargo build --release |
-| java | pom.xml / build.gradle | mvn package -DskipTests / gradle build |
-| unknown | .state.md tech_stack.build_tool | 读取用户指定的命令；如无则跳。?|
+根据 tech_stack.language 路由构建命令。
 
-跳过条件。?- test_strategy=manual → test_strategy=none: 跳过构建步骤，记录"构建跳过（test_strategy={value}，无需自动化构建验证）"
+跳过条件：test_strategy=manual / none → 跳过。
 
 ## Step 4: 自检清单
 
 逐项确认:
-- [ ] 所有新增代码有对应测试（test_strategy=none/manual 时此项改变已确认无需自动化测试）
-- [ ] 测试全部通过（或已跳过且记录原因）
+- [ ] 所有新增代码有对应黑盒测试（test_strategy=none/manual 时改为确认无需自动化测试）
+- [ ] 黑盒测试全部通过（通过率 100%）
+- [ ] 白盒覆盖率 ≥ 80%（如适用）
+- [ ] R2 Implementation Review 已通过
 - [ ] Lint 无错误（或已跳过且记录原因）
 - [ ] 构建成功（或已跳过且记录原因）
 - [ ] 未修改白名单外的文件
 - [ ] 未引入新的安全漏洞（无硬编码密钥、无 SQL 拼接等）
-
+- [ ] 数据操作 Skill 使用正确（未直接操作数据层）
 
 ## 输出
 
-将结果记录到 specs/de-reports/code-report.md → 测试结果"→ 自检结果"部分析
+将结果记录到 `output/{feature-name}/drafts/code-report.md`：
+
 ```
 ## 测试结果
-- 测试数: {N}
-- 通过: {N}
+- 黑盒测试数: {N}
+- 黑盒通过: {N}（100%）
+- 白盒覆盖率: {N}%（≥80%）
 - 失败: 0
 
 ## 自检结果
+- R2 Implementation Review: PASS
 - dev-test: PASS
 ```
 
 ## 失败处理
 
 - 任何一步失败：修复后从该步重新执行
-- DE 内部自修最多 3 次（子循环）：超出后端 handoff 回报中标志status=failed，附带错误日志- → 3 次限制是 DE 角色内部的自修上限；PM 层面的修复循环最多5轮 agh-apply.md→ - 即：每轮 PM 派发修复时，DE 内部最多尝试 3 次自修；若仍失败则回报PM，PM 决定是否继续下一切。
+- DE 内部自修最多 3 次（子循环）：超出后在 handoff 回报中标注 status=failed，附带错误日志
+- 3 次限制是 DE 角色内部自修上限；PM 层面的修复循环最多 5 轮
+- 每轮 PM 派发修复时，DE 内部最多尝试 3 次自修；仍失败则回报 PM

@@ -46,12 +46,23 @@
 
 | 角色 | 默认身份 | 默认职责 |
 |------|---------|---------|
-| PM | 流程调度中枢 | 调度、检查、人机交互|
-| BA | 需求分析师 | 需求结构化（SHALL + GWT）?|
-| SA | 方案架构建| 技术方案+ Tasks 清单 |
-| DE | 开发工程师 | TDD 编码实现 |
-| TE | 测试工程师| 审计验证 |
+| PM | 流程调度中枢 | 调度、检查、人机交互、动态同步管理 |
+| BA | 业务分析智能体 | 需求澄清+分析，编排业务 Skill（SHALL + GWT）|
+| SA | 系统分析智能体 | 需求矩阵+概要设计，编排系统分析 Skill |
+| DE | 开发智能体 | TDD 编码实现 + 三阶段 Code-Review（R1/R2/R3）|
+| TE | 测试智能体 | 黑盒+白盒测试用例生成、审计验证 |
 | reviewer | 只读评审代理 | 代码/架构/配置评审 |
+
+**数据操作 Skill（所有执行角色共享的数据层访问）：**
+
+| 数据操作 Skill | 职责 | 存储架构 |
+|---------------|------|---------|
+| FeatureService | Feature 配置管理（开关/参数/依赖/作用域/生命周期） | Feature 存储 |
+| SpecService | Spec 需求规格读写 | Spec 存储 |
+| KnowledgeService | 领域知识查询/沉淀 | Hybrid: LLM Wiki 层（语义检索）+ 关系图谱层（确定性查询），三级缓存 |
+| CodeGraphService | 代码结构分析 | L1 静态索引（Clang AST）+ L2 LLM 语义 + L3 增量更新 |
+
+> **架构原则**：Agent 编排业务 Skill，业务 Skill 通过数据操作 Skill 访问数据层；执行角色禁止直接操作数据层。
 
 #### Step 3: 收集规范需求
 
@@ -109,6 +120,15 @@
    →   →   ├── propose.md
    →   →   ├── apply.md
    →   →   └── archive.md
+   →   ├── data-services/
+   →   →   ├── feature-service.md
+   →   →   ├── spec-service.md
+   →   →   ├── knowledge-service.md
+   →   →   └── code-graph-service.md
+   →   ├── code-review/
+   →   →   ├── r1-pre-review.md
+   →   →   ├── r2-implementation-review.md
+   →   →   └── r3-refactoring-review.md
    →   ├── prepare-review/
    →   →   └── SKILL.md
    →   ├── architecture-review/

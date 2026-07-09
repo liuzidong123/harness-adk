@@ -1,16 +1,28 @@
 # Android Game Harness 全局纪律
 
 > AI Agent 驱动的研发流程框架。四层防线：Rules → Skills → Agents+Workflow → Scripts+人工程
-## 角色
+>
+> 架构范式：**Agent 编排 Skill，Skill 驱动数据操作 Skill，数据操作 Skill 读写数据层**（详见 `feature_spec_knowledge.md`）
+
+## 角色（智能体）
 
 | 角色 | 职责 | 定义文件 |
 |------|------|---------|
-| PM | 调度、检查、人机交互| agents/pm.md |
-| BA | 需求分析| agents/ba.md |
-| SA | 架构设计 | agents/sa.md |
-| DE | 编码实现 | agents/de.md |
-| TE | 审计验证 | agents/te.md |
+| PM | 调度、检查、人机交互、动态同步管理 | agents/pm.md |
+| BA | 业务分析（需求澄清+分析）| agents/ba.md |
+| SA | 系统分析（需求矩阵+概要设计）| agents/sa.md |
+| DE | 开发（TDD + 三阶段 Code-Review R1/R2/R3）| agents/de.md |
+| TE | 测试（黑盒+白盒用例生成、审计验证）| agents/te.md |
 | UX | 视觉/结构设计 | agents/ux.md |
+
+## 数据操作 Skill（数据层访问，所有执行角色共享）
+
+| 数据操作 Skill | 职责 | 存储架构 |
+|---------------|------|---------|
+| FeatureService | Feature 配置管理（开关/参数/依赖/作用域/生命周期，基于 Android SystemFeatures）| Feature 存储 |
+| SpecService | Spec 需求规格读写（与 Knowledge 双向转化）| Spec 存储 |
+| KnowledgeService | 领域知识查询/沉淀 | Hybrid: LLM Wiki 层（语义检索）+ 关系图谱层（确定性查询），三级缓存（L1 热/L2 上下文/L3 持久） |
+| CodeGraphService | 代码结构分析 | L1 静态索引（Clang AST/CG/CFG/#ifdef）+ L2 LLM 语义 + L3 增量更新 |
 
 ## 命令
 
@@ -49,6 +61,15 @@
 
 - 任何文件写入后必须验证文件存在且非空
 - DE 编码后必须执行dev-test skill（根据stack 路由测试命令）- TE 审计根据 test_strategy 选择验证方法；E2E 环境不可用时降级并标志- 交付判定依赖脚本退出码，不依赖 Agent 自述
+- DE 必须完整执行 TDD 循环含三阶段 Code-Review：R1 Pre-Review（红阶段前）→ 红（黑盒失败）→ 绿 + R2 Implementation Review → 白盒 → 重构 + R3 Refactoring Review，禁止跳过任一 Review 阶段
+- 黑盒测试通过率必须 100%，白盒分支覆盖率必须 ≥ 80%（如适用）
+
+## 4b. 数据操作纪律
+
+- 执行角色（BA/SA/DE/TE/UX）禁止直接操作数据层，所有数据读写必须通过数据操作 Skill（FeatureService/SpecService/KnowledgeService/CodeGraphService）
+- KnowledgeService 查询自动路由：结构化查询（Feature 关系/约束）→ 关系图谱层；语义查询（自然语言描述/案例）→ LLM Wiki 层 + RAG
+- CodeGraphService 渐进查询：L1 静态（1-5ms）→ L2 语义（异步）→ L3 增量（仅变更文件）
+- 代码变更后 CodeGraphService 必须增量更新图谱（L3）
 
 ## 5. 断点恢复
 
@@ -68,6 +89,14 @@
 - **TE** → OpenSpec 格式测试用例 + 测试报告，含 TC↔需求↔Task 追溯
 - **UX** → OpenSpec 格式设计规格，含设计元素↔需求追溯
   各角色输出目录下设drafts/（草稿）、specs/（定稿）、changes/（变更）三个子目录构建OpenSpec 工作流程PM 调度时根据 选择 openspec_strategy：fast→direct, standard/full→review, CHANGE→change
+
+## 7b. 动态同步机制
+
+- Feature/Spec/Knowledge 三者通过事件总线（Event Bus）自动、可追溯、事件驱动地双向同步
+- Spec 变更 → 触发关联 Feature 重新评估 + 提取 Knowledge；Feature 创建/修改 → 校验关联 Knowledge 约束；Knowledge 新增/升级 → 扫描全量 Feature
+- 每次同步记录 changelog（source_version/target_version/action/diff_hash/consistency_status/timestamp）
+- 每次同步完成生成一致性快照 `{Spec version}_{Feature snapshot}_{Knowledge version}.snap`，支持 git-like checkout 回溯
+- PM 在 SR3 通过后、archive 前必须执行一致性快照检查（见 skills/agh-archive.md）
 ---
 
 ## 8. 产出类型体系（output_type）

@@ -27,6 +27,15 @@ repair_origin: ""  # "de-self-repair" | "pm-redispatch"
 - {file_path_1}
 - {file_path_2}
 
+## 数据操作 Skill 白名单
+
+执行角色仅可通过以下数据操作 Skill 访问数据层（禁止直接操作数据层）：
+
+- [ ] FeatureService — Feature 配置查询/生成/更新
+- [ ] SpecService — Spec 需求规格读写
+- [ ] KnowledgeService — 领域知识查询（LLM Wiki 层 + 关系图谱层）
+- [ ] CodeGraphService — 代码结构分析（L1 静态 / L2 语义 / L3 增量）
+
 ## 期望输出
 
 | 阶段 | 输出路径 | 说明 |
@@ -53,7 +62,8 @@ repair_origin: ""  # "de-self-repair" | "pm-redispatch"
 - summary: "{一句话描述完成情况或失败原因}"
 - issues: "{具体错误信息，无问题时填 N/A}"
 - dev-test结果: "{PASS/FAIL/SKIP}"  # DE 专用
-- test结果: "{通过/失败数}"         # TE 专用
+- code-review结果: "{R1:PASS/R2:PASS/R3:PASS}"  # DE 专用（三阶段 Code-Review）
+- test结果: "{黑盒通过率/白盒覆盖率}"  # TE 专用
 
 ## 轮次信息
 

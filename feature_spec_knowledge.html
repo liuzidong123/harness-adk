@@ -1,0 +1,1923 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Harness — Feature / Spec / Knowledge / Skill 架构设计指南</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root { --bg: #ffffff; --text: #1a1a2e; --primary: #2563eb; --border: #e2e8f0; --code-bg: #f1f5f9; --heading-color: #0f172a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif; color: var(--text); background: var(--bg); line-height: 1.7; font-size: 15px; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 2.2em; color: var(--heading-color); border-bottom: 3px solid var(--primary); padding-bottom: 12px; margin-bottom: 20px; }
+  h2 { font-size: 1.6em; color: var(--heading-color); margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 1.25em; color: var(--heading-color); margin-top: 32px; margin-bottom: 12px; }
+  h4 { font-size: 1.1em; color: var(--primary); margin-top: 24px; margin-bottom: 10px; }
+  p { margin-bottom: 14px; }
+  a { color: var(--primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  blockquote { border-left: 4px solid var(--primary); background: #f0f7ff; padding: 12px 20px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 0.95em; color: #334155; }
+  blockquote p { margin: 0; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; font-size: 0.88em; color: #e11d48; }
+  pre { background: var(--code-bg); padding: 16px 20px; border-radius: 8px; overflow-x: auto; margin: 16px 0; border: 1px solid var(--border); font-size: 0.85em; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.93em; }
+  th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; vertical-align: top; }
+  th { background: #f8fafc; font-weight: 600; color: var(--heading-color); }
+  tr:nth-child(even) { background: #f8fafc; }
+  ul, ol { margin: 10px 0 14px 24px; }
+  li { margin-bottom: 6px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .mermaid-box { margin: 24px 0; padding: 20px; background: #fafbfc; border-radius: 8px; border: 1px solid var(--border); overflow-x: auto; text-align: center; }
+  .mermaid-box svg { max-width: 100%; height: auto; }
+  .toc { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px 28px; margin-bottom: 32px; }
+  .toc ul { margin: 0; padding-left: 20px; list-style: none; }
+  .toc > ul { padding-left: 0; }
+  .toc li { margin-bottom: 4px; }
+  @media (max-width: 640px) { .container { padding: 16px 12px 60px; } h1 { font-size: 1.6em; } h2 { font-size: 1.3em; } table { font-size: 0.82em; } th, td { padding: 6px 8px; } }
+</style>
+</head>
+<body>
+<div class="container" id="root"></div>
+<script id="md-source" type="text/plain">
+# AI Harness — Feature / Spec / Knowledge / Skill 架构设计指南
+
+> AI Harness 项目：基于 Android 系统 Feature 配置管理的智能体（Agent）领域建模
+>
+> 核心设计：**Agent 编排 Skill，Skill 驱动数据操作 Skill，数据操作 Skill 读写数据层**
+
+## 目录
+
+- [一、总体架构关系](#一总体架构关系)
+- [二、各层职责边界](#二各层职责边界)
+  - [2.1 Feature 层 — 配置管理中枢（基于 Android SystemFeatures）](#21-feature-层--配置管理中枢基于-android-systemfeatures)
+  - [2.2 Spec 层 — 需求契约（与 Knowledge 双向转化）](#22-spec-层--需求契约与-knowledge-双向转化)
+  - [2.3 Knowledge 层 — 领域知识](#23-knowledge-层--领域知识)
+    - [KnowledgeService 存储架构：Hybrid（LLM Wiki + 关系图谱）](#knowledgeservice-存储架构hybridllm-wiki--关系图谱)
+    - [渐进加载策略：三级缓存 + 上下文预取](#渐进加载策略三级缓存--上下文预取)
+  - [2.4 Code 层 — 代码资产（Feature 隔离，Spec 驱动）](#24-code-层--代码资产feature-隔离spec-驱动)
+  - [2.5 Skill 层 — 能力原子（由 Agent 编排）](#25-skill-层--能力原子由-agent-编排)
+    - [CodeGraphService 推荐方案：增量构建的代码知识图谱](#codegraphservice-推荐方案增量构建的代码知识图谱)
+- [三、具体案例：Android Display HDR Feature 配置](#三具体案例android-display-hdr-feature-配置)
+- [四、完整开发链路案例：从需求到 Code-Review](#四完整开发链路案例从需求到-code-review)
+- [五、关键设计机制](#五关键设计机制)
+  - [5.1 双向追溯机制](#51-双向追溯机制)
+  - [5.2 版本一致性机制](#52-版本一致性机制)
+  - [5.3 Spec ↔ Knowledge 双向转化机制](#53-spec--knowledge-双向转化机制)
+    - [Feature/Spec/Knowledge 动态同步机制](#featurespecknowledge-动态同步机制)
+- [六、总结：一句话定义](#六总结一句话定义)
+
+---
+
+## 一、总体架构关系
+
+```mermaid
+flowchart TB
+    subgraph AgentLayer["🤖 Agent 层 — 智能体编排"]
+        AG1[BA 业务分析智能体]
+        AG2[SA 系统分析智能体]
+        AG3[DE 开发智能体]
+        AG4[TE 测试智能体]
+    end
+
+    subgraph SkillLayer["🎯 Skill 层 — 能力原子"]
+        S1[配置生成 Skill]
+        S2[冲突检测 Skill]
+        S3[影响分析 Skill]
+        S4[合规校验 Skill]
+        S5[智能推荐 Skill]
+        S6[报告生成 Skill]
+        S7[Code-Graph Skill]
+        S8[Code-Review Skill]
+    end
+
+    subgraph FeatureLayer["⚙️ Feature 层 — 配置管理"]
+        F1[Feature 定义]
+        F2[依赖关系]
+        F3[作用域规则]
+        F4[生命周期状态]
+        F5[Spec 溯源]
+    end
+
+    subgraph SpecLayer["📋 Spec 层 — 需求契约"]
+        SP1[需求规格]
+        SP2[需求矩阵]
+        SP3[概要设计]
+    end
+
+    subgraph KnowledgeLayer["🧠 Knowledge 层 — 领域知识"]
+        K1[行业与标准知识]
+        K2[技术栈知识]
+        K3[平台差异知识]
+        K4[约束规则库]
+        K5[历史案例库]
+        K6[最佳实践库]
+    end
+
+    subgraph CodeLayer["💻 Code 层 — 代码资产"]
+        C1[功能代码]
+        C2[测试用例代码]
+        C3[测试脚本]
+    end
+
+    AgentLayer -->|编排调用| SkillLayer
+    SkillLayer -->|读取/操作| FeatureLayer
+    SkillLayer -->|查询| KnowledgeLayer
+    SkillLayer -->|生成/分析| CodeLayer
+    FeatureLayer -->|绑定/溯源| SpecLayer
+    FeatureLayer -->|受约束于| KnowledgeLayer
+    FeatureLayer -->|驱动生成| CodeLayer
+    SpecLayer -->|驱动创建| FeatureLayer
+    KnowledgeLayer -->|指导校验| FeatureLayer
+    KnowledgeLayer -->|沉淀自| FeatureLayer
+    KnowledgeLayer -->|约束代码实现| CodeLayer
+    SpecLayer <-->|相互转化| KnowledgeLayer
+    CodeLayer -->|反馈验证| FeatureLayer
+```
+
+**核心原则**：
+- **Agent 编排 Skill**：Agent 是面向业务场景的"智能体"，编排多个 Skill 完成端到端任务（如"新增 HDR 功能"Agent 编排需求分析→配置生成→代码生成→测试生成 Skill）
+- **Skill 驱动数据操作 Skill**：业务 Skill 是原子化的"能力单元"，通过调用数据操作 Skill（FeatureService/SpecService/KnowledgeService/CodeGraphService）完成数据层的读写
+- **Feature 是 Spec 的系统能力化表达**：Spec 定义"做什么"，Feature 将 Spec 转化为 Android SystemFeatures 可识别、可查询、可隔离的能力声明，遵循 `PackageManager.hasSystemFeature()` 体系
+- **Spec 与 Knowledge 双向转化**：Spec 中的标准/协议可沉淀为 Knowledge，Knowledge 可反向生成 Spec 模板
+- **Feature 是代码隔离的维度**：通过 SystemFeatures 三态验证（编译期宏、安装期 XML、运行期 API）实现代码隔离
+- **Spec 决定代码实现**：Spec 定义"做什么"和"怎么做"，直接指导功能代码的接口定义、逻辑分支和实现细节
+- **Code 是最终产物**：功能代码、测试用例代码、测试脚本均受 Feature 配置驱动，并反向验证配置正确性
+- 上层依赖下层，下层不感知上层；同层之间通过 ID 关联
+
+---
+
+## 二、各层职责边界
+
+### 2.1 Feature 层 —— "配置管理中枢（基于 Android SystemFeatures）"
+
+**核心职责**：Feature 层完全对齐 **Android SystemFeatures** 机制，将业务 Spec 中定义的功能能力映射为系统可识别、可查询、可隔离的 Feature 配置。每个 Feature 对应一个系统能力声明，遵循 Android 的 `PackageManager.hasSystemFeature()` 查询体系和 `/etc/permissions/*.xml` 静态声明体系。
+
+**SystemFeatures 与 Spec 的映射关系**：
+
+```mermaid
+flowchart TB
+    subgraph Spec["📋 Spec 层 — 功能规格"]
+        S1["需求规格 3.2.1<br/>支持 HDR10/HLG 解码显示"]
+        S2["需求规格 3.2.2<br/>支持 HDR 到 SDR 的 Tone Mapping"]
+        S3["概要设计 2.1<br/>Display HAL 层新增 hdr_mode 接口"]
+    end
+
+    subgraph Feature["⚙️ Feature 层 — SystemFeatures 声明"]
+        F1["FEATURE_HDR_ENABLE<br/>com.tcl.feature.hdr_enable"]
+        F2["FEATURE_HDR_TONEMAP<br/>com.tcl.feature.hdr_tonemap"]
+        F3["FEATURE_MTK_HDR_PATH<br/>com.tcl.feature.mtk_hdr_path"]
+    end
+
+    subgraph Android["🤖 Android 系统 — 三态验证"]
+        A1["编译期：宏定义隔离"]
+        A2["安装期：XML 静态声明"]
+        A3["运行期：API 动态查询"]
+    end
+
+    Spec -->|1:1 映射| Feature
+    Feature -->|隔离代码路径| Android
+```
+
+**映射规则**：
+| Spec 层级 | 映射目标 | Feature 命名 | 示例 |
+|-----------|----------|--------------|------|
+| **需求规格**（做什么） | 能力开关 | `FEATURE_{能力}_ENABLE` | `FEATURE_HDR_ENABLE` ← Spec 3.2.1 |
+| **需求规格**（参数范围） | 能力参数 | `FEATURE_{能力}_{参数}` | `FEATURE_HDR_TONEMAP` ← Spec 3.2.2 |
+| **概要设计**（平台适配） | 平台路径 | `FEATURE_{平台}_{能力}` | `FEATURE_MTK_HDR_PATH` ← Spec 2.1 |
+| **需求矩阵** | 追溯绑定 | `specBindings` | Feature 绑定到 Spec 条目 |
+
+**Android SystemFeatures 三态验证机制**：
+
+| 验证时机 | Android 原生机制 | 本系统扩展 | 作用 |
+|----------|------------------|------------|------|
+| **编译期** | `Android.bp` 条件模块 | `#ifdef FEATURE_HDR_ENABLE` | 代码是否参与编译 |
+| **安装期** | `/etc/permissions/*.xml` | `<feature name="com.tcl.feature.hdr_enable" />` | 系统能力声明 |
+| **运行期** | `pm.hasSystemFeature(String)` | `pm.hasSystemFeature("com.tcl.feature.hdr_enable")` | 运行时能力查询 |
+
+**管理维度**：
+| 维度 | 管理内容 | SystemFeatures 体现 | 示例 |
+|------|----------|---------------------|------|
+| **能力开关** | 某项功能是否启用 | XML 声明 + 运行时查询 | `FEATURE_HDR_ENABLE = true` |
+| **能力参数** | 功能的具体工作模式 | Feature 关联的配置项 | `FEATURE_HDR_TONEMAP = "AUTO"` |
+| **依赖管理** | 能力间的启用先后/互斥关系 | Feature 的 `relations` 定义 | `FEATURE_HDR_MODE` 依赖 `FEATURE_HDR_ENABLE` |
+| **作用域管理** | 能力生效的平台/版本/机型范围 | 不同机型的 XML 文件差异 | MTK 平台声明 `FEATURE_MTK_HDR_PATH` |
+| **生命周期** | 配置项从创建到废弃的流转 | Feature 状态管理 | 草稿 → 评审中 → 已生效 → 已废弃 |
+| **需求溯源** | 配置与需求文档的双向追溯 | `specBindings` 绑定 | 绑定到 `SPEC_DISPLAY_001` 第 3.2.1 节 |
+
+> **设计原则**：Feature 层是 **Spec 的系统能力化表达**。Spec 定义"做什么"，Feature 将 Spec 转化为 Android 系统可识别、可查询、可隔离的能力声明。每个 Feature 必须有对应的 Spec 来源，每个 Spec 能力必须映射为可验证的 Feature。
+
+```mermaid
+classDiagram
+    class Feature {
+        +String key
+        +String name
+        +FeatureType type
+        +String defaultValue
+        +Range validRange
+        +LifecycleState state
+        +List~FeatureBinding~ specBindings
+        +List~FeatureRelation~ relations
+        +List~ScopeRule~ scopes
+        +createDraft()
+        +validate()
+        +applyKnowledge()
+    }
+
+    class FeatureBinding {
+        +String specId
+        +BindingType type
+        +String section
+    }
+
+    class FeatureRelation {
+        +String targetFeatureKey
+        +RelationType type
+        +String description
+    }
+
+    class ScopeRule {
+        +Platform platform
+        +Region region
+        +String modelPattern
+        +AndroidVersion minVersion
+    }
+
+    Feature "1" --> "*" FeatureBinding : references
+    Feature "1" --> "*" FeatureRelation : has
+    Feature "1" --> "*" ScopeRule : applies to
+```
+
+> **设计原则**：Feature 是**一等公民**，Spec 是 Feature 的**需求来源之一**；一个 Feature 可以对应**一个主 Spec + 多个补充 Spec**。
+
+---
+
+### 2.2 Spec 层 —— "需求契约（Feature 的源头，与 Knowledge 双向转化）"
+
+**核心职责**：Spec 是 **Feature 的唯一定义来源**。每个 Feature 必须对应 Spec 中的一个或多个需求条目，Spec 的变更必须触发 Feature 的重新评估。同时，Spec 中的通用标准/协议约束可沉淀为 Knowledge，Knowledge 中的规则也可反向生成 Spec 模板。
+
+**Spec → Feature 映射机制**：
+
+```mermaid
+flowchart TB
+    subgraph SpecDoc["📋 Spec 文档"]
+        S1[需求规格 3.2.1<br/>支持 HDR10/HLG 视频解码显示]
+        S2[需求规格 3.2.2<br/>支持 HDR 到 SDR 的 Tone Mapping]
+        S3[需求规格 3.2.3<br/>支持用户手动开关 HDR 功能]
+        S4[概要设计 2.1<br/>Display HAL 层新增 hdr_mode 接口]
+    end
+
+    subgraph Mapping["🔄 映射规则"]
+        M1[能力开关映射]
+        M2[能力参数映射]
+        M3[平台路径映射]
+    end
+
+    subgraph FeatureCfg["⚙️ Feature 配置"]
+        F1[FEATURE_HDR_ENABLE<br/>type: bool]
+        F2["FEATURE_HDR_TONEMAP<br/>type: enum<br/>range: [OFF, AUTO, FORCE_SDR]"]
+        F3[FEATURE_HDR_USER_CTRL<br/>type: bool]
+        F4[FEATURE_MTK_HDR_PATH<br/>type: bool<br/>scope: MTK]
+    end
+
+    S1 -->|能力开关| M1
+    S2 -->|能力参数| M2
+    S3 -->|能力开关| M1
+    S4 -->|平台适配| M3
+
+    M1 --> F1
+    M2 --> F2
+    M1 --> F3
+    M3 --> F4
+```
+
+**映射规则**：
+| Spec 内容类型 | Feature 生成规则 | 示例 |
+|---------------|------------------|------|
+| **功能需求**（做什么） | 生成 `FEATURE_{能力}_ENABLE` 开关 | Spec 3.2.1 "支持 HDR10" → `FEATURE_HDR_ENABLE` |
+| **参数需求**（取值范围） | 生成 `FEATURE_{能力}_{参数}` 枚举/整型 | Spec 3.2.2 "Tone Mapping" → `FEATURE_HDR_TONEMAP` |
+| **用户控制需求** | 生成独立的用户控制开关 | Spec 3.2.3 "用户手动开关" → `FEATURE_HDR_USER_CTRL` |
+| **平台适配设计** | 生成 `FEATURE_{平台}_{能力}` 平台特定 Feature | Spec 2.1 "MTK HAL 接口" → `FEATURE_MTK_HDR_PATH` |
+| **互斥/依赖设计** | 生成 Feature `relations` 定义 | Spec 设计章节 "HDR 依赖 HDMI 2.1" → `FEATURE_HDR_ENABLE` 依赖 `FEATURE_HDMI_2_1` |
+
+**Spec → Feature 变更联动**：
+| Spec 变更类型 | Feature 响应 | 示例 |
+|---------------|--------------|------|
+| **新增需求条目** | 自动生成对应 Feature 草案 | Spec 新增 3.2.4 "支持 Dolby Vision" → 生成 `FEATURE_DOLBY_VISION_ENABLE` |
+| **修改需求范围** | 更新 Feature 的 `validRange` 或 `scopes` | Spec 3.2.2 增加 "FORCE_HDR10" 选项 → `FEATURE_HDR_TONEMAP` 扩展枚举值 |
+| **删除需求条目** | 标记关联 Feature 为废弃状态 | Spec 删除 3.2.3 → `FEATURE_HDR_USER_CTRL` 状态变为已废弃 |
+| **升级 Spec 版本** | 触发关联 Feature 的重新评估 | Spec v1.0 → v2.0 → 所有关联 Feature 进入评审状态 |
+
+**Spec → Knowledge 转化**：
+| 场景 | 过程 | 示例 |
+|------|------|------|
+| **标准文档解析** | 从 Spec 中提取行业标准条款，沉淀为 Knowledge | `SPEC_2024_DV_001` 中的 Dolby Vision 兼容要求 → `KNOW_DV_STANDARD_001` |
+| **协议约束提取** | 从 Spec 的概要设计中提取技术栈约束 | HDMI VSIF 发送要求 → `KNOW_HDMI_PROTOCOL_001` |
+| **平台适配总结** | 从多个项目 Spec 中归纳平台差异 | 多个 MTK 项目 Spec 中重复的 HDR 路径要求 → `KNOW_MTK_HDR_001` |
+
+**Knowledge → Spec 转化**：
+| 场景 | 过程 | 示例 |
+|------|------|------|
+| **模板生成** | 基于 Knowledge 中的标准规则，生成新 Spec 的模板 | 新项目的 HDMI 功能 Spec 自动包含 HDCP 2.2 要求 |
+| **合规检查** | 用 Knowledge 规则校验 Spec 完整性 | 检查新 Spec 是否遗漏 Dolby Vision 的 HDR10 兼容条款 |
+| **约束注入** | 将 Knowledge 中的平台约束写入 Spec 的设计章节 | 自动在概要设计中添加 MTK HDR 路径要求 |
+
+```mermaid
+erDiagram
+    SPEC ||--o{ FEATURE_BINDING : generates
+    SPEC {
+        string id "SPEC_2024_DISPLAY_001"
+        string type "requirement|matrix|design"
+        string title "HDR 显示功能需求"
+        string version "v1.2"
+        date createdAt
+        date updatedAt
+    }
+
+    FEATURE_BINDING {
+        string featureKey "FEATURE_HDR_ENABLE"
+        string bindingType "primary|supplementary"
+        string section "3.2.1"
+    }
+
+    SPEC ||--o{ SPEC_CONTENT : contains
+    SPEC_CONTENT {
+        string requirement "支持 HDR10/HLG 解码..."
+        string matrix "需求-Feature-用例 追溯表"
+        string design "Display HAL 接口定义..."
+    }
+```
+
+| 文档类型 | 职责定位 | 与 Feature 的关系 |
+|----------|----------|-------------------|
+| **需求规格** | 定义"做什么"：功能描述、用户场景、验收标准 | Feature 的**创建依据** |
+| **需求矩阵** | 定义"覆盖度"：需求 ↔ Feature ↔ 测试用例 的追溯矩阵 | Feature 的**完整性校验依据** |
+| **概要设计** | 定义"怎么做"：模块划分、接口定义、数据流 | Feature 的**技术实现约束** |
+
+> **设计原则**：Spec 是 **Feature 的唯一定义来源**，是**只读或版本化**的输入；Feature 是 Spec 的**系统能力化表达**，是**可修改**的配置实体。Spec 与 Feature 支持 **1:N** 和 **N:1** 的绑定关系，但每个 Feature 必须有明确的 Spec 来源。
+
+---
+
+### 2.3 Knowledge 层 —— "领域知道什么"
+
+**核心职责**：沉淀**跨项目可复用**的领域规则和专家经验。
+
+```mermaid
+mindmap
+  root((Knowledge<br/>领域知识库))
+    行业与标准知识
+      视频标准
+        HDR10: EOTF SMPTE ST 2084
+        HLG: ARIB STD-B67
+        Dolby Vision: 专有动态元数据
+      显示标准
+        HDMI 2.1: FRL速率与Feature绑定
+        CTA-861-G: AVI InfoFrame规范
+      安全标准
+        Widevine L1/L3与解密Feature
+        PlayReady硬件绑定规则
+    技术栈知识
+      HDMI技术栈
+        DDC/EDID读取时序
+        HDCP 2.3握手流程
+        HDR Metadata传输路径
+      Android显示栈
+        SurfaceFlinger合成策略
+        HWC HAL接口版本差异
+        VSync与缓冲区投递机制
+      媒体技术栈
+        MediaCodec配置约束
+        OMX与Codec2接口差异
+        TIF会话生命周期管理
+    平台差异知识
+      MTK平台
+        HDR需同时开启FEATURE_MTK_HDR_PATH
+        4K场景下SCALER_MODE不能为LEGACY
+      RTK平台
+        待机唤醒时序与AML不同
+      AML平台
+        HDMI AVI包处理有特有逻辑
+    约束规则库
+      互斥规则
+        FEATURE_AI_UPSCALER与FEATURE_LEGACY_SCALER互斥
+      依赖规则
+        FEATURE_4K_ENABLE依赖FEATURE_HDMI_2_1
+      版本规则
+        Android 14+才支持FEATURE_AI_UPSCALER
+      标准合规规则
+        支持Dolby Vision必须同时支持HDR10
+    历史案例库
+      T966D5CN-7901: TIF超时根因分析
+      LINTHY-43627: ANR问题解决方案
+    最佳实践库
+      Feature命名规范
+      默认值设置建议
+      性能优化配置组合
+```
+
+| 知识类型 | 示例 | 来源 |
+|----------|------|------|
+| **行业与标准知识** | HDR10 使用 SMPTE ST 2084 EOTF；Dolby Vision 需动态元数据 | 标准文档 |
+| **技术栈知识** | HDMI HDCP 2.3 握手失败会导致 FEATURE_HDCP_ENABLE 回退 | 技术规范 |
+| **平台知识** | MTK 平台 HDR 特性需要同时开启 `FEATURE_HDR_ENABLE` 和 `FEATURE_MTK_HDR_PATH` | 平台适配经验 |
+| **约束规则** | 如果 `FEATURE_4K_ENABLE=true`，则 `FEATURE_SCALER_MODE` 不能为 `LEGACY` | 技术规范 |
+| **历史案例** | 某机型因 Feature 冲突导致 TIF 超时，解决方案是... | 问题复盘 |
+| **最佳实践** | Android 14 后 `FEATURE_AI_UPSCALER` 推荐默认开启 | 专家经验 |
+
+> **设计原则**：Knowledge 是**长期有效、持续积累**的资产，从 Spec 解析和冲突解决过程中自动提取。
+
+#### KnowledgeService 存储架构：Hybrid（LLM Wiki + 关系图谱）
+
+根据知识类型差异，KnowledgeService 采用混合存储策略，而非单一方案：
+
+```mermaid
+flowchart TB
+    subgraph Hybrid["🧩 KnowledgeService Hybrid 存储架构"]
+        direction TB
+        W["📄 LLM Wiki 层<br/>自然语言知识"]
+        G["🔗 关系图谱层<br/>结构化规则"]
+    end
+
+    subgraph Wiki["LLM Wiki 层 — 语义检索"]
+        W1[行业标准描述<br/>Dolby Vision v2.9 兼容要求]
+        W2[历史案例复盘<br/>T966D5CN-7901 根因分析]
+        W3[最佳实践说明<br/>Android 14 AI_UPSCALER 推荐]
+        W4[技术栈文档<br/>HDMI HDCP 2.3 握手流程]
+    end
+
+    subgraph Graph["关系图谱层 — 确定性查询"]
+        G1[依赖规则<br/>FEATURE_DV → FEATURE_HDR_ENABLE]
+        G2[互斥规则<br/>FEATURE_AI_UPSCALER ⟂ FEATURE_LEGACY_SCALER]
+        G3[版本规则<br/>FEATURE_AI_UPSCALER ≥ Android 14]
+        G4[平台规则<br/>MTK → FEATURE_MTK_HDR_PATH]
+        G5[值约束<br/>FEATURE_HDCP_VERSION ≥ 2.2]
+    end
+
+    Hybrid --> Wiki
+    Hybrid --> Graph
+```
+
+| 维度 | LLM Wiki 层 | 关系图谱层 |
+|------|-------------|-----------|
+| **存储内容** | 自然语言描述、文档、案例复盘 | 结构化规则：依赖/互斥/版本/平台/值约束 |
+| **查询方式** | Embedding 语义检索 + LLM 推理 | 图遍历 / SPARQL / Cypher |
+| **确定性** | 近似匹配，结果需 LLM 二次校验 | 精确匹配，确定性逻辑推理 |
+| **适合场景** | "这个场景的最佳实践是什么？"、"历史上有类似的案例吗？" | "FEATURE_A 开启时 FEATURE_B 是否被强制要求？"、"哪些 Feature 依赖 FEATURE_X？" |
+| **更新方式** | 文档追加 + 索引重建 | 节点/边 CRUD，增量更新 |
+
+**查询路由规则**：业务 Skill 调用 KnowledgeService 时，由 Service 层自动路由：
+
+```
+Skill 请求 → KnowledgeService Router →
+  ├─ 结构化查询（Feature 关系/约束） → 关系图谱层
+  └─ 语义查询（自然语言描述/案例）   → LLM Wiki 层 + RAG
+```
+
+**示例**：`合规校验 Skill` 查询 "FEATURE_DOLBY_VISION 是否强制依赖 FEATURE_HDR_ENABLE？" → 路由到关系图谱层，精确返回 `mandatory_dependency` 边。而 "为什么 Dolby Vision 必须兼容 HDR10？" → 路由到 LLM Wiki 层，检索 `KNOW_DV_STANDARD_001` 的完整描述。
+
+#### 渐进加载策略：三级缓存 + 上下文预取
+
+为最快获取所需知识，KnowledgeService 采用三级渐进加载：
+
+```
+请求发起
+    │
+    ▼
+┌─────────────────────┐
+│ L1: 进程内热缓存     │ ← 命中 → 返回
+│ (高频规则, 命中率~60%)│
+└─────────┬───────────┘
+          │ 未命中
+          ▼
+┌─────────────────────┐
+│ L2: 上下文预取缓存   │ ← 命中 → 返回
+│ (基于当前会话预加载)  │
+└─────────┬───────────┘
+          │ 未命中
+          ▼
+┌─────────────────────┐
+│ L3: 持久层检索       │
+│ (图谱查询 / 语义检索) │
+└─────────┬───────────┘
+          │ 返回并回填 L1/L2
+          ▼
+        响应
+```
+
+| 层级 | 缓存内容 | 预热策略 | 失效策略 |
+|------|----------|----------|----------|
+| **L1 热缓存** | 全局高频规则（平台差异、基础依赖/互斥） | 服务启动时加载 top-N | LRU 淘汰，置信度 `low` 优先淘汰 |
+| **L2 上下文缓存** | 当前会话相关的知识 | Agent/Skill 激活时预取：根据当前 Feature/Spec ID 遍历关联边 → 预加载关联知识 | Agent 上下文切换时失效 |
+| **L3 持久层** | 全量知识 | 按需 + embedding 语义检索 | 不适⽤缓存，实时查询 |
+
+**预取触发时机**：
+
+```mermaid
+sequenceDiagram
+    participant App as Agent/Skill
+    participant KS as KnowledgeService
+    participant Cache as 缓存管理器
+    participant Graph as 关系图谱层
+    participant Wiki as LLM Wiki 层
+
+    App->>KS: 激活上下文<br/>(SpecID=SPEC_2024_DISPLAY_001, Platform=MTK)
+
+    Note over KS: 阶段1: 预取预热（异步，不阻塞）
+    KS->>Cache: 检查 L1 是否命中
+    Cache-->>KS: HDR 基础规则命中
+
+    KS->>Graph: 查询关联规则<br/>by SpecID=SPEC_2024_DISPLAY_001
+    Graph-->>KS: 返回依赖/互斥规则列表
+    KS->>Cache: 写入 L2 上下文缓存
+
+    KS->>Wiki: 语义检索相关文本<br/>(MTK HDR 最佳实践)
+    Wiki-->>KS: 返回 KNOW_MTK_HDR_001
+    KS->>Cache: 写入 L2 上下文缓存
+
+    Note over KS: 阶段2: 业务查询（同步）
+    App->>KS: 合规校验请求
+    KS->>Cache: L1 命中 → 直接返回
+    KS-->>App: 0.5ms 响应
+
+    App->>KS: 查询历史案例
+    KS->>Cache: L1/L2 均未命中
+    KS->>Wiki: 语义检索
+    Wiki-->>KS: 返回结果
+    KS->>Cache: 回填 L1
+    KS-->>App: 15ms 响应
+```
+
+---
+
+### 2.4 Code 层 —— "代码资产（Feature 隔离，Spec 驱动）"
+
+**核心职责**：Code 是 Feature 配置的**最终落地产物**。三者关系为：
+- **Spec 决定"写什么"**：定义接口、逻辑分支、实现细节
+- **Feature 决定"编译/运行什么"**：通过条件编译和运行时分支隔离不同能力路径
+- **Code 反向验证**：编译/测试/运行结果反馈 Feature 配置和 Spec 实现的正确性
+
+```mermaid
+flowchart TB
+    subgraph SpecLayer["📋 Spec 层 — 决定'写什么'"]
+        SP1[需求规格：功能边界/验收标准]
+        SP2[概要设计：接口定义/数据流]
+    end
+
+    subgraph FeatureLayer["⚙️ Feature 层 — 决定'编译/运行什么'"]
+        F1[FEATURE_HDR_ENABLE]
+        F2[FEATURE_HDR_TONEMAP]
+        F3[FEATURE_MTK_HDR_PATH]
+    end
+
+    subgraph CodeLayer["💻 Code 层 — 最终产物"]
+        direction TB
+        C1[功能代码]
+        C2[测试用例代码]
+        C3[测试脚本]
+    end
+
+    SpecLayer -->|决定接口与逻辑| CodeLayer
+    FeatureLayer -->|隔离编译/运行路径| CodeLayer
+    CodeLayer -->|编译/测试反馈| FeatureLayer
+    CodeLayer -->|实现验证| SpecLayer
+```
+
+#### 三者关系详解
+
+| 维度 | Spec 的作用 | Feature 的作用 | Code 的反馈 |
+|------|-------------|----------------|-------------|
+| **接口定义** | Spec 概要设计定义方法签名、参数类型、返回值 | Feature 决定是否暴露该接口 | 编译时发现接口与实现不匹配 |
+| **逻辑分支** | Spec 需求定义功能边界和处理流程 | Feature 决定分支是否参与编译/执行 | 测试发现分支覆盖遗漏 |
+| **平台适配** | Spec 设计章节定义平台差异处理策略 | Feature 作用域决定平台特定代码路径 | 运行时发现平台组合异常 |
+| **能力组合** | Spec 矩阵定义需求与能力的映射 | Feature 依赖关系约束能力组合 | 自动化测试发现组合冲突 |
+
+#### Feature 是代码隔离的维度
+
+基于 Android SystemFeatures 机制，Feature 通过**静态声明**、**编译期宏**和**运行时查询**三种方式隔离代码：
+
+| 隔离方式 | 机制 | Android SystemFeatures 示例 |
+|----------|------|------------------------------|
+| **静态声明** | `/etc/permissions/` 下的 XML 文件声明设备能力 | `<feature name="com.tcl.feature.hdr_enable" />` |
+| **条件编译** | 通过 `#ifdef` / `ifeq` 等预处理器指令 | `#ifdef FEATURE_HDR_ENABLE ... #endif` |
+| **运行时查询** | 通过 `PackageManager.hasSystemFeature()` 动态判断 | `if (pm.hasSystemFeature(FEATURE_HDR_ENABLE)) { ... }` |
+| **接口多态** | 通过 Feature 组合选择不同实现类 | `HDRFactory.getProcessor(FeatureSet)` |
+
+**隔离效果**：
+- XML 中未声明 `FEATURE_HDR_ENABLE` 时，应用层查询返回 false，HDR 逻辑不启用
+- `#ifdef FEATURE_HDR_ENABLE` 为 false 时，HDR 相关代码不参与编译
+- `FEATURE_MTK_HDR_PATH=true` 时，走 MTK 特有的数据路径实现
+- 不同机型通过不同 Feature 组合，构建出差异化的代码镜像和系统能力
+
+#### Spec 决定代码实现
+
+Spec 从两个层面决定代码如何写：
+
+| Spec 类型 | 决定内容 | 代码体现 |
+|-----------|----------|----------|
+| **需求规格** | 功能边界、输入输出、异常处理 | 接口定义、参数校验、返回值规范 |
+| **概要设计** | 模块划分、接口定义、数据流 | 类结构、方法签名、调用时序 |
+
+**完整示例**：
+```cpp
+// ============================================
+// Step 1: Spec 决定接口定义
+// Spec 概要设计 2.1：Display HAL 层新增 hdr_mode 接口
+// ============================================
+enum HdrMode {
+    HDR_MODE_OFF = 0,       // Spec 3.2.3：用户可关闭 HDR
+    HDR_MODE_AUTO = 1,      // Spec 3.2.1：自动检测 HDR10/HLG
+    HDR_MODE_FORCE_SDR = 2, // Spec 3.2.2：Tone Mapping 到 SDR
+};
+
+// ============================================
+// Step 2: Feature 隔离代码路径
+// FEATURE_HDR_ENABLE 决定这段代码是否编译/运行
+// ============================================
+#ifdef FEATURE_HDR_ENABLE
+status_t DisplayHal::setHdrMode(HdrMode mode) {
+    // 运行时二次确认：SystemFeatures 静态声明检查
+    if (!mPm.hasSystemFeature(TclFeatures.FEATURE_HDR_ENABLE)) {
+        return INVALID_OPERATION;  // Feature 未声明，拒绝执行
+    }
+
+    // ============================================
+    // Step 3: Spec 决定内部实现逻辑
+    // ============================================
+    switch (mode) {
+        case HDR_MODE_AUTO:
+            // Spec 3.2.1：支持 HDR10/HLG 解码显示
+            return handleAutoHdrDetection();
+
+        case HDR_MODE_FORCE_SDR:
+            // Spec 3.2.2：支持 HDR 到 SDR 的 Tone Mapping
+            return applyToneMapping();
+
+        case HDR_MODE_OFF:
+            // Spec 3.2.3：支持用户手动开关 HDR
+            return disableHdrPath();
+    }
+}
+#endif
+```
+
+```xml
+<!-- ============================================ -->
+<!-- Step 4: Feature 静态声明，决定设备能力暴露 -->
+<!-- /etc/permissions/tcl_display_features.xml -->
+<!-- ============================================ -->
+<permissions>
+    <!-- FEATURE_HDR_ENABLE=true 时声明，应用层才能查询到 -->
+    <feature name="com.tcl.feature.hdr_enable" />
+    <!-- FEATURE_HDR_TONEMAP 取值范围由 Spec 3.2.2 决定 -->
+    <feature name="com.tcl.feature.hdr_tonemap" />
+</permissions>
+```
+
+| 代码类型 | 定义 | 与 Feature/Spec 的关系 | 示例 |
+|----------|------|------------------------|------|
+| **功能代码** | 实现业务功能的源代码 | **Feature 隔离路径**，**Spec 决定实现** | `#ifdef FEATURE_HDR_ENABLE` 包裹的 HDR 处理逻辑（由 Spec 3.2.1 定义） |
+| **测试用例代码** | 验证功能正确性的单元/集成测试代码 | 基于 Feature 边界条件 + Spec 验收标准生成 | 针对 `FEATURE_HDR_TONEMAP` 三个取值的参数化测试（验证 Spec 3.2.2） |
+| **测试脚本** | 自动化测试的执行脚本 | 根据 Feature 作用域和 Spec 场景生成 | 针对 MTK/RTK/AML 平台分别生成的 HDMI 兼容性测试脚本 |
+
+#### Code → Feature/Spec 反馈闭环
+
+| 反馈类型 | 过程 | 价值 |
+|----------|------|------|
+| **编译时反馈** | 功能代码编译失败，提示 Feature 配置与代码实现不匹配 | 发现 `FEATURE_HDR_ENABLE=true` 但缺少对应 HAL 实现（Spec 2.1 未落实） |
+| **运行时反馈** | 测试用例执行失败，暴露 Feature 默认值的合理性 | 发现 `FEATURE_HDR_TONEMAP` 默认值在特定机型下导致花屏 |
+| **自动化验证** | 测试脚本批量执行，验证 Feature 组合的正确性 | 发现 `FEATURE_DOLBY_VISION_ENABLE=true` 时未自动开启 `FEATURE_HDR_ENABLE` |
+| **Spec 一致性检查** | Code Review 时发现代码实现与 Spec 描述不符 | 发现代码实现了 Spec 中未定义的功能，或遗漏了 Spec 要求的功能 |
+
+> **设计原则**：Code 不是孤立的存在，而是 **Spec 定义"写什么"**、**Feature 决定"编译/运行什么"**、**Code 反馈"写得对不对"** 的三方协作产物。三类代码资产共同构成"实现-验证-自动化"的完整闭环。
+
+---
+
+### 2.5 Skill 层 —— "能力原子（由 Agent 编排，驱动数据操作 Skill）"
+
+**核心职责**：Skill 是**原子化的能力单元**，分为**业务 Skill** 和**数据操作 Skill** 两类：
+- **业务 Skill**：面向具体业务任务（如配置生成、代码生成、测试用例生成）
+- **数据操作 Skill**：面向数据层操作（FeatureService/SpecService/KnowledgeService/CodeGraphService），为业务 Skill 提供数据读写能力
+
+**Agent** 面向业务场景，编排多个业务 Skill 完成端到端任务；业务 Skill 通过调用数据操作 Skill 完成数据层的读写。
+
+**Agent 分类：BA / SA / DE / TE 四类智能体**
+
+| 维度 | BA 业务分析智能体 | SA 系统分析智能体 | DE 开发智能体 | TE 测试智能体 |
+|------|-------------------|-------------------|---------------|---------------|
+| **定位** | 面向业务需求，澄清用户真实意图 | 面向系统设计，定义技术实现方案 | 面向开发场景，基于 TDD 模式驱动开发 | 面向测试场景，保障代码质量与功能正确性 |
+| **核心职责** | 需求澄清、需求分析、验收标准定义 | 需求矩阵设计、概要设计、架构设计 | 配置管理、代码生成、代码审查 | 测试用例生成、测试用例执行、缺陷分析 |
+| **TDD 模式** | — | — | 先写测试用例 → 再写功能代码 → 重构优化 | 验证功能代码是否满足测试用例 |
+| **Skill 示例** | 需求分析、需求澄清 | 需求矩阵生成、概要设计生成 | 配置生成、功能代码生成、Code-Review | 测试用例代码生成、测试脚本生成、测试执行 |
+| **交付物** | 结构化需求条目、验收标准 | 需求矩阵、概要设计文档 | Feature 配置、功能代码 | 测试用例代码、测试脚本、测试报告 |
+
+**Agent vs Skill 的关系**：
+
+| 维度 | Agent | Skill |
+|------|-------|-------|
+| **定位** | 面向业务场景的"智能体" | 原子化的"能力单元" |
+| **职责** | 理解用户意图，拆解任务，编排 Skill 执行流程 | 执行单一、具体的操作 |
+| **示例** | DE 开发智能体编排"新增 HDR 功能"全流程 | 配置生成 Skill、代码生成 Skill、合规校验 Skill |
+| **状态** | 可维护会话状态，进行多轮交互 | 无状态，单次调用即完成 |
+| **调用方式** | 接收用户自然语言/指令输入 | 被 Agent 调用，接收结构化参数 |
+
+```mermaid
+flowchart TB
+    subgraph Input["输入"]
+        I1[用户请求]
+        I2[Spec文档]
+        I3[Feature变更]
+        I4[代码仓库]
+    end
+
+    subgraph AgentLayer["🤖 Agent 层 — 智能体编排"]
+        AG1[BA 业务分析智能体]
+        AG2[SA 系统分析智能体]
+        AG3[DE 开发智能体]
+        AG4[TE 测试智能体]
+    end
+
+    subgraph BA["BA 业务分析 Skill"]
+        direction LR
+        B1[需求澄清]
+        B2[需求分析]
+    end
+
+    subgraph SA["SA 系统分析 Skill"]
+        direction LR
+        S1[需求矩阵设计]
+        S2[概要设计生成]
+    end
+
+    subgraph Forward["DE 开发 Skill（基于 TDD）"]
+        direction LR
+        F1[配置生成]
+        F2[功能代码生成]
+        F3[Code-Review]
+        F4[冲突检测]
+        F5[影响分析]
+        F6[合规校验]
+    end
+
+    subgraph Test["TE 测试 Skill"]
+        direction LR
+        T1[黑盒测试用例生成]
+        T2[白盒测试用例生成]
+        T3[测试脚本生成]
+        T4[测试执行]
+        T5[缺陷分析]
+    end
+
+    subgraph Reverse["逆向分析 Skill"]
+        direction LR
+        R1[Code-Graph]
+        R2[Code-Diff]
+        R3[Diff-Test关联]
+    end
+
+    subgraph Report["报告 Skill"]
+        S6[报告生成]
+    end
+
+    subgraph DataSkill["🗄️ 数据操作 Skill"]
+        direction TB
+        DS1[FeatureService]
+        DS2[SpecService]
+        DS3[KnowledgeService]
+        DS4[CodeGraphService]
+    end
+
+    subgraph CodeLayer["💻 Code 层 — 代码资产"]
+        C1[功能代码]
+        C2[测试用例代码]
+        C3[测试脚本]
+    end
+
+    subgraph DataLayer["数据层"]
+        D1[Feature存储]
+        D2[Spec存储]
+        D3[Knowledge存储]
+        D4[代码图谱存储]
+    end
+
+    Input --> AgentLayer
+    AgentLayer -->|BA 编排| BA
+    AgentLayer -->|SA 编排| SA
+    AgentLayer -->|DE 编排| Forward
+    AgentLayer -->|TE 编排| Test
+    AgentLayer -->|共享编排| Reverse
+    BA --> SA
+    SA --> Forward
+    Forward --> CodeLayer
+    Test --> CodeLayer
+    Forward --> Report
+    Test --> Report
+    Reverse --> Report
+    BA -->|调用| ServiceLayer
+    SA -->|调用| ServiceLayer
+    Forward -->|调用| DataSkill
+    Test -->|调用| DataSkill
+    Reverse -->|调用| DataSkill
+    DataSkill -->|读写| DataLayer
+    CodeLayer -->|反馈| FeatureLayer
+```
+
+| Skill 类型 | 功能描述 | 依赖层 |
+|------------|----------|--------|
+| **配置生成** | 基于 Spec 自动生成 Feature 配置草案 | Spec → Feature |
+| **冲突检测** | 检测 Feature 间的依赖/互斥冲突 | Feature + Knowledge |
+| **影响分析** | 修改 Feature X 会影响哪些模块/机型 | Feature + Knowledge |
+| **合规校验** | 检查配置是否符合 Spec 要求和平台约束 | Feature + Spec + Knowledge |
+| **智能推荐** | 基于历史案例推荐最优配置组合 | Knowledge |
+| **报告生成** | 生成 Feature 变更报告、差异对比 | Feature + Spec |
+
+#### BA 业务分析 Skill
+
+| Skill 类型 | 功能描述 | 输入 → 输出 |
+|------------|----------|-------------|
+| **需求澄清** | 与用户多轮交互，澄清模糊需求，明确业务目标和用户场景 | 原始需求描述 → 澄清后的需求条目 |
+| **需求分析** | 解析需求文档，提取功能点、非功能约束、验收标准、边界条件 | 需求条目 → 结构化需求分析文档 |
+
+#### SA 系统分析 Skill
+
+| Skill 类型 | 功能描述 | 输入 → 输出 |
+|------------|----------|-------------|
+| **需求矩阵设计** | 建立 需求 ↔ Feature ↔ 测试用例 的完整追溯矩阵，确保需求全覆盖 | 结构化需求 + Feature 草案 → 需求矩阵 |
+| **概要设计生成** | 基于 Feature 和 Knowledge 生成模块划分、接口定义、数据流、时序图 | Feature + Knowledge → 概要设计文档 |
+
+#### DE 开发 Skill（基于 TDD 模式）
+
+TDD 循环：**红（测试失败）→ 绿（测试通过）→ 重构**
+
+| Skill 类型 | 功能描述 | TDD 阶段 | 输入 → 输出 |
+|------------|----------|----------|-------------|
+| **配置生成** | 基于 Spec 自动生成 Feature 配置草案 | 准备阶段 | Spec → Feature 配置 |
+| **R1 Pre-Review** | 结合 Spec/Knowledge/Feature/当前代码进行可行性分析、冲突检测、影响评估，输出审核通过的需求规格与测试需求 | 红阶段前 | Spec + Knowledge + Feature + 当前代码 → 审核报告 + 修正需求 + 测试需求规格 |
+| **功能代码生成** | 根据 Feature 配置和概要设计生成功能实现代码 | 绿阶段 | Feature + 概要设计 → 功能代码 |
+| **R2 Implementation Review** | 基于 Code Diff vs Spec + Knowledge + Feature 进行实现审查，确保代码正确实现了需求且遵循约束 | 绿→重构间 | Code Diff + Spec + Knowledge + Feature → Review 报告（Pass/Fail + 问题清单） |
+| **R3 Refactoring Review** | 基于 Feature/Spec/Knowledge 对代码变更进行合规性审查、代码质量与模式检查 | 重构阶段 | 重构代码 + Feature + Spec + Knowledge + 测试结果 → 质量报告 |
+| **冲突检测** | 检测 Feature 间的依赖/互斥冲突 | 重构阶段 | Feature + Knowledge → 冲突报告 |
+| **影响分析** | 修改 Feature X 会影响哪些模块/机型 | 重构阶段 | Feature + Knowledge → 影响清单 |
+| **合规校验** | 检查配置是否符合 Spec 要求和平台约束 | 重构阶段 | Feature + Spec + Knowledge → 合规报告 |
+
+#### TE 测试 Skill
+
+| Skill 类型 | 功能描述 | 输入 → 输出 |
+|------------|----------|-------------|
+| **黑盒测试用例生成** | 基于 Spec 需求规格和 Feature 边界条件生成黑盒测试用例（不关注内部实现） | 需求矩阵 + Feature → 黑盒测试用例代码 |
+| **白盒测试用例生成** | 基于功能代码和概要设计生成白盒测试用例（关注内部逻辑、分支、路径覆盖） | 功能代码 + 概要设计 → 白盒测试用例代码 |
+| **测试脚本生成** | 根据 Feature 作用域和平台规则生成自动化测试脚本 | Feature + Knowledge → 测试脚本 |
+| **测试执行** | 执行黑盒/白盒测试用例和测试脚本，收集覆盖率与通过率 | 测试代码 + 被测系统 → 测试执行报告 |
+| **缺陷分析** | 分析测试失败原因，关联到 Feature/Spec/Code，区分黑盒/白盒缺陷类型 | 测试报告 → 缺陷定位报告 |
+
+**黑盒 vs 白盒测试对比**：
+
+| 维度 | 黑盒测试 | 白盒测试 |
+|------|----------|----------|
+| **测试视角** | 外部行为验证（输入→输出） | 内部逻辑验证（分支/路径/条件） |
+| **生成时机** | TDD 红阶段（功能代码之前） | TDD 绿阶段之后（功能代码完成之后） |
+| **输入依赖** | Spec 需求规格、Feature 边界条件 | 功能代码、概要设计、Code-Graph |
+| **覆盖目标** | 需求覆盖度 100% | 分支覆盖率 ≥ 80%、路径覆盖 |
+| **用例类型** | 正常场景、边界值、异常输入 | 分支覆盖、条件覆盖、路径覆盖、MC/DC |
+| **执行标准** | 通过率 100% | 覆盖率 ≥ 80% 且无阻塞性失败 |
+| **失败回退** | 功能代码不满足需求 → DE 修改代码 | 逻辑分支未覆盖 → DE 补充实现或调整用例 |
+
+#### 逆向分析 Skill（DE/TE 共享）
+
+| Skill 类型 | 功能描述 | 输入 → 输出 |
+|------------|----------|-------------|
+| **Code-Graph** | 构建代码依赖图谱，分析模块调用关系、Feature 与代码的映射 | 代码仓库 → 代码知识图谱 |
+| **Code-Diff** | 分析代码变更差异，识别受影响的 Feature、模块、接口 | Git Diff → 变更影响清单 |
+| **Diff-Test 关联** | 根据代码差异自动关联需回归的测试用例 | 代码差异 + 测试用例库 → 回归测试集 |
+
+> **设计原则**：Skill 是**无状态的编排逻辑**，通过 Service 访问底层数据，便于独立扩展和测试。
+
+#### CodeGraphService 推荐方案：增量构建的代码知识图谱
+
+CodeGraphService 为白盒测试、Code-Review、变更影响分析、Diff-Test 关联提供底层代码结构数据。采用**静态分析 + LLM 语义增强**的混合架构：
+
+```mermaid
+flowchart TB
+    subgraph Input["代码输入"]
+        I1[Git 仓库增量变更]
+        I2[全量基线代码]
+    end
+
+    subgraph L1["L1: 静态索引层 — 快速、确定"]
+        S1[Clang Tooling / AST 解析]
+        S2[符号表: 文件→类→函数→宏]
+        S3[调用图 CG + 控制流图 CFG]
+        S4["#ifdef FEATURE_X 条件分支映射"]
+        S5[Git Diff → 变更影响范围]
+    end
+
+    subgraph L2["L2: LLM 语义层 — 丰富、近似"]
+        L2A["语义标注: '这段代码实现了哪个 Spec 条目？'"]
+        L2B["间接影响分析: '修改 FEATURE_X 还会影响谁？'"]
+        L2C["自然语言↔代码映射索引"]
+    end
+
+    subgraph L3["L3: 增量更新引擎"]
+        W1[文件系统/IDE Watch]
+        W2[仅重分析变更文件]
+        W3[差分更新图谱关系]
+    end
+
+    subgraph Store["代码图谱存储"]
+        D1[(节点: 文件/类/函数/Feature 宏)]
+        D2[(边: 调用/继承/包含/#ifdef 绑定)]
+        D3[(Feature↔Code 映射索引)]
+    end
+
+    Input --> L3
+    L3 --> L1
+    L1 --> L2
+    L2 --> Store
+```
+
+| 层级 | 技术选型 | 查询时延 | 覆盖能力 | 更新成本 |
+|------|----------|----------|----------|----------|
+| **L1 静态层** | Clang Tooling / libTooling / ASTMatcher | 1-5ms | 函数调用、宏定义、`#ifdef` 分支、继承关系 | 增量解析 50ms/文件 |
+| **L2 语义层** | LLM (GPT-4/Claude) + Embedding 索引 | 50-500ms | 自然语言→代码映射、间接影响推测、代码意图理解 | 异步批处理，非实时 |
+| **L3 增量引擎** | FileSystem Watch + Git Hook | — | 变更检测 + 差分更新 | 仅处理变更文件 |
+
+**代码→Feature 映射流程**（选 Key 场景 — 白盒测试生成）：
+
+```mermaid
+sequenceDiagram
+    participant SWB as 白盒测试生成Skill
+    participant CGS as CodeGraphService
+    participant FS as FeatureService
+
+    SWB->>CGS: 查询模块分支/路径覆盖
+    CGS->>CGS: L1 静态索引 → 返回 CFG + 分支信息
+
+    SWB->>FS: 查询 Feature 开关组合
+    FS-->>SWB: 返回有效组合列表
+
+    SWB->>CGS: 查询 #ifdef FEATURE_X 分支映射
+    CGS->>CGS: L1 索引 → 定位条件编译分支
+    CGS-->>SWB: 返回 Feature↔代码分支映射表
+
+    SWB->>CGS: 查询间接影响（LLM 语义）
+    CGS->>CGS: L2 语义层 → 推测未显式 #ifdef 的依赖
+    CGS-->>SWB: 返回语义依赖清单
+
+    SWB-->>SWB: 生成 MC/DC 覆盖测试用例
+```
+
+---
+
+## 三、具体案例：Android Display HDR Feature 配置
+
+### 3.1 场景描述
+
+**业务背景**：为某 MTK 平台 Android 14 机型新增 HDR 显示功能，涉及多个 Feature 的配置管理。
+
+### 3.2 输入 Spec
+
+```yaml
+# SPEC_2024_DISPLAY_001 — 需求规格
+spec:
+  id: SPEC_2024_DISPLAY_001
+  type: requirement
+  title: "HDR 显示功能需求"
+  version: "v1.0"
+  content:
+    requirement: |
+      3.2.1 支持 HDR10/HLG 视频解码显示
+      3.2.2 支持 HDR 到 SDR 的 Tone Mapping
+      3.2.3 支持用户手动开关 HDR 功能
+    matrix: |
+      | 需求项 | Feature | 测试用例 |
+      |--------|---------|----------|
+      | 3.2.1  | FEATURE_HDR_ENABLE | TC_HDR_001 |
+      | 3.2.2  | FEATURE_HDR_TONEMAP | TC_HDR_002 |
+      | 3.2.3  | FEATURE_HDR_USER_CTRL | TC_HDR_003 |
+    design: |
+      2.1 Display HAL 层新增 hdr_mode 接口
+      2.2 SurfaceFlinger 增加 HDR 图层合成路径
+```
+
+### 3.3 协作流程
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant BA as BA 业务分析智能体
+    participant SA as SA 系统分析智能体
+    participant DE as DE 开发智能体
+    participant TE as TE 测试智能体
+    participant SkillBA as 需求分析Skill
+    participant SkillSA1 as 需求矩阵设计Skill
+    participant SkillSA2 as 概要设计生成Skill
+    participant SkillGen as 配置生成Skill
+    participant SkillCode as 功能代码生成Skill
+    participant SkillTest as 测试用例生成Skill
+    participant SkillCheck as 合规校验Skill
+    participant SpecSvc as SpecService
+    participant FeatSvc as FeatureService
+    participant KnowSvc as KnowledgeService
+
+    User->>BA: 输入原始需求
+
+    rect rgb(230, 245, 255)
+        Note over BA: BA 阶段：需求澄清与分析
+        BA->>SkillBA: 调用需求分析Skill
+        SkillBA-->>BA: 返回结构化需求条目
+        BA-->>User: 需求确认
+    end
+
+    User->>SA: 确认需求
+
+    rect rgb(245, 230, 255)
+        Note over SA: SA 阶段：系统分析与设计
+        SA->>SkillSA1: 调用需求矩阵设计Skill
+        SkillSA1->>FeatSvc: 查询 Feature 草案
+        FeatSvc-->>SkillSA1: 返回草案
+        SkillSA1-->>SA: 返回需求矩阵
+
+        SA->>SkillSA2: 调用概要设计生成Skill
+        SkillSA2->>KnowSvc: 查询技术栈约束
+        KnowSvc-->>SkillSA2: 返回约束规则
+        SkillSA2-->>SA: 返回概要设计文档
+        SA-->>User: 设计评审
+    end
+
+    User->>DE: 启动开发
+
+    rect rgb(255, 245, 230)
+        Note over DE,TE: TDD 红阶段：TE 先行生成测试
+        DE->>TE: 传递 Feature 配置 + Spec + 概要设计
+        TE->>SkillTest: 调用测试用例生成Skill
+        SkillTest->>FeatSvc: 查询 Feature 边界条件
+        FeatSvc-->>SkillTest: 返回取值范围
+        SkillTest-->>TE: 返回测试用例代码
+        TE-->>DE: 测试用例就绪（红阶段完成）
+    end
+
+    rect rgb(230, 255, 230)
+        Note over DE: TDD 绿阶段：DE 编写功能代码
+        DE->>SkillGen: 调用配置生成Skill
+        SkillGen->>SpecSvc: 解析 Spec 文档
+        SpecSvc-->>SkillGen: 返回解析结果
+
+        SkillGen->>FeatSvc: 创建 Feature 草案
+        FeatSvc->>FeatSvc: 生成 FEATURE_HDR_ENABLE
+        FeatSvc->>FeatSvc: 生成 FEATURE_HDR_TONEMAP
+        FeatSvc->>FeatSvc: 生成 FEATURE_HDR_USER_CTRL
+        FeatSvc-->>SkillGen: 返回草案列表
+
+        SkillGen->>KnowSvc: 查询平台规则
+        KnowSvc-->>SkillGen: MTK平台HDR需额外开启 FEATURE_MTK_HDR_PATH
+
+        SkillGen->>FeatSvc: 补充关联 Feature
+        FeatSvc->>FeatSvc: 生成 FEATURE_MTK_HDR_PATH
+        FeatSvc-->>SkillGen: 更新完成
+        SkillGen-->>DE: 返回配置草案
+
+        DE->>SkillCheck: 调用合规校验Skill
+        SkillCheck->>KnowSvc: 查询约束规则
+        KnowSvc-->>SkillCheck: 返回互斥/依赖规则
+        SkillCheck->>FeatSvc: 验证 Feature 组合
+        FeatSvc-->>SkillCheck: 返回验证结果
+        SkillCheck-->>DE: 校验通过
+
+        DE->>SkillCode: 调用功能代码生成Skill
+        SkillCode->>SpecSvc: 查询概要设计
+        SpecSvc-->>SkillCode: 返回接口定义
+        SkillCode-->>DE: 返回功能代码
+    end
+
+    rect rgb(255, 230, 230)
+        Note over DE,TE: TE 介入：执行测试
+        DE->>TE: 传递功能代码
+        TE->>TE: 执行测试用例
+        TE-->>DE: 测试通过（绿阶段完成）
+    end
+
+    rect rgb(255, 255, 230)
+        Note over DE: 重构阶段：Code-Review
+        DE->>DE: 调用 Code-Review Skill
+        DE->>SpecSvc: 更新需求矩阵
+        SpecSvc-->>DE: 矩阵已更新
+    end
+
+    DE-->>User: 返回完整配置 + 代码 + 测试 + 报告
+```
+
+### 3.4 生成的 Feature 配置
+
+```yaml
+# Feature 配置输出
+features:
+  - key: FEATURE_HDR_ENABLE
+    name: "HDR 显示开关"
+    type: bool
+    defaultValue: false
+    scopes:
+      - platform: MTK
+        minAndroidVersion: "14"
+    specBindings:
+      - specId: "SPEC_2024_DISPLAY_001"
+        type: primary
+        section: "3.2.1"
+    relations:
+      - targetFeature: FEATURE_MTK_HDR_PATH
+        type: dependency
+        description: "MTK平台需同时开启HDR数据路径"
+
+  - key: FEATURE_HDR_TONEMAP
+    name: "HDR Tone Mapping"
+    type: enum
+    validRange: ["OFF", "AUTO", "FORCE_SDR"]
+    defaultValue: "AUTO"
+    specBindings:
+      - specId: "SPEC_2024_DISPLAY_001"
+        type: primary
+        section: "3.2.2"
+
+  - key: FEATURE_HDR_USER_CTRL
+    name: "HDR 用户手动控制"
+    type: bool
+    defaultValue: true
+    specBindings:
+      - specId: "SPEC_2024_DISPLAY_001"
+        type: primary
+        section: "3.2.3"
+
+  - key: FEATURE_MTK_HDR_PATH
+    name: "MTK HDR 数据路径"
+    type: bool
+    defaultValue: false
+    scopes:
+      - platform: MTK
+    specBindings:
+      - specId: "SPEC_2024_DISPLAY_001"
+        type: supplementary
+        section: "2.1"
+    relations:
+      - targetFeature: FEATURE_HDR_ENABLE
+        type: dependent_on
+```
+
+### 3.5 扩展案例：Dolby Vision 配置（涉及行业标准与技术栈知识）
+
+**场景**：在 HDMI 2.1 接口上支持 Dolby Vision，需同时满足行业标准和技术栈约束。
+
+**Spec 输入**：
+```yaml
+spec:
+  id: SPEC_2024_DV_001
+  type: requirement
+  title: "Dolby Vision 显示支持"
+  content:
+    requirement: |
+      4.1 支持 Dolby Vision Profile 5/8 内容解码
+      4.2 通过 HDMI 输出 Dolby Vision 信号
+      4.3 支持 Dolby Vision 与 HDR10 自适应切换
+```
+
+**Knowledge 层介入**：
+```yaml
+# 行业与标准知识
+knowledge:
+  - id: KNOW_DV_STANDARD_001
+    type: industry_standard
+    standard: "Dolby Vision Specification v2.9"
+    description: |
+      Dolby Vision 必须向后兼容 HDR10：
+      - 若 FEATURE_DOLBY_VISION_ENABLE=true，
+      - 则 FEATURE_HDR_ENABLE 必须为 true
+      - 且 FEATURE_HDR_TONEMAP 不能为 FORCE_SDR
+
+  - id: KNOW_HDMI_PROTOCOL_001
+    type: tech_stack
+    protocol: "HDMI 2.1 + Dolby Vision VSIF"
+    description: |
+      HDMI 输出 Dolby Vision 时：
+      - 必须发送 Dolby Vision VSIF (Vendor Specific InfoFrame)
+      - 需要 FEATURE_HDMI_VSIF_ENABLE=true
+      - HDCP 版本需 >= 2.2 (FEATURE_HDCP_VERSION >= 2.2)
+```
+
+**Skill 执行过程**：
+```mermaid
+sequenceDiagram
+    participant SkillGen as 配置生成Skill
+    participant KnowSvc as KnowledgeService
+    participant FeatSvc as FeatureService
+
+    SkillGen->>KnowSvc: 查询 Dolby Vision 相关知识
+    KnowSvc-->>SkillGen: 返回标准规则 + 协议约束
+
+    SkillGen->>FeatSvc: 创建 FEATURE_DOLBY_VISION_ENABLE
+    FeatSvc->>FeatSvc: 自动关联 FEATURE_HDR_ENABLE (标准强制)
+    FeatSvc->>FeatSvc: 自动关联 FEATURE_HDMI_VSIF_ENABLE (协议要求)
+    FeatSvc->>FeatSvc: 自动关联 FEATURE_HDCP_VERSION=2.2 (协议要求)
+    FeatSvc-->>SkillGen: 返回完整 Feature 集合
+```
+
+**最终 Feature 组合**：
+```yaml
+features:
+  - key: FEATURE_DOLBY_VISION_ENABLE
+    type: bool
+    defaultValue: false
+    relations:
+      - targetFeature: FEATURE_HDR_ENABLE
+        type: mandatory_dependency
+        reason: "Dolby Vision标准强制要求兼容HDR10"
+      - targetFeature: FEATURE_HDMI_VSIF_ENABLE
+        type: mandatory_dependency
+        reason: "HDMI协议要求发送Dolby Vision VSIF"
+      - targetFeature: FEATURE_HDCP_VERSION
+        type: value_constraint
+        constraint: ">= 2.2"
+        reason: "HDCP 2.2是Dolby Vision最小要求"
+```
+
+### 3.6 Knowledge 沉淀
+
+```yaml
+# 从本次配置过程中提取并沉淀到 Knowledge 层
+knowledge:
+  - id: KNOW_MTK_HDR_001
+    type: platform_rule
+    platform: MTK
+    description: "MTK平台启用HDR时必须同时开启FEATURE_MTK_HDR_PATH"
+    source: "SPEC_2024_DISPLAY_001 配置过程"
+    confidence: high
+
+  - id: KNOW_HDR_SCOPE_001
+    type: scope_rule
+    description: "HDR相关Feature仅适用于Android 14+"
+    affectedFeatures: ["FEATURE_HDR_ENABLE", "FEATURE_HDR_TONEMAP"]
+
+  - id: KNOW_DV_STANDARD_001
+    type: industry_standard
+    standard: "Dolby Vision v2.9"
+    description: "Dolby Vision强制依赖HDR10基础能力"
+    source: "SPEC_2024_DV_001 配置过程"
+
+  - id: KNOW_HDMI_DV_001
+    type: tech_stack
+    protocol: "HDMI 2.1"
+    description: "Dolby Vision输出需要VSIF和HDCP 2.2+"
+    source: "SPEC_2024_DV_001 配置过程"
+```
+
+---
+
+## 四、完整开发链路案例：从需求到 Code-Review
+
+### 4.1 正向开发链路（BA → SA → DE + TE 基于 TDD）
+
+```mermaid
+flowchart LR
+    subgraph Phase1["阶段1：需求澄清与分析（BA）"]
+        P1[原始需求描述]
+        P1 -->|需求澄清Skill| P2[澄清后需求]
+        P2 -->|需求分析Skill| P3[结构化需求条目]
+    end
+
+    subgraph Phase2["阶段2：系统分析与设计（SA）"]
+        P3 -->|需求矩阵设计Skill| P4[需求追溯矩阵]
+        P3 -->|概要设计生成Skill| P5[概要设计文档]
+    end
+
+    subgraph Phase3["阶段3：R1 Pre-Review（DE + TE 联合审查）"]
+        P4 -->|R1 Pre-Review Skill| P6_R[审核报告<br/>+ 修正需求<br/>+ 测试需求规格]
+        P5 -->|R1 Pre-Review Skill| P6_R
+    end
+
+    subgraph Phase4["阶段4：TDD 红阶段（TE 黑盒先行）"]
+        P6_R -->|黑盒测试用例生成Skill| P6[黑盒测试用例代码]
+        P6_R -->|测试脚本生成Skill| P7[测试脚本]
+    end
+
+    subgraph Phase5["阶段5：TDD 绿阶段（DE 实现）+ R2"]
+        P5 -->|配置生成Skill| P8[Feature配置]
+        P8 -->|功能代码生成Skill| P9[功能代码]
+        P9 -->|R2 Implementation Review| P9_R[实现审查报告<br/>→ Pass 继续 / Fail 修正]
+        P9_R -->|Fail| P9
+    end
+
+    subgraph Phase6["阶段6：白盒阶段 + R3 重构"]
+        P9_R -->|Pass| P10[白盒测试用例代码]
+        P10 -->|测试执行| P11[覆盖率报告]
+        P11 -->|覆盖率<80%| P9
+        P11 -->|覆盖率≥80%| P12[R3 Refactoring Review + 重构]
+        P12 -->|重构完成| P13[最终代码 + 测试 + 报告]
+    end
+
+    Phase1 --> Phase2 --> Phase3 --> Phase4 --> Phase5 --> Phase6
+```
+
+**TDD 协作模式（含三阶段 Code-Review）**：
+| 阶段 | 主导 Agent | 关键 Skill | 产出 |
+|------|-----------|------------|------|
+| **需求阶段** | BA 业务分析智能体 | 需求澄清、需求分析 | 结构化需求条目 |
+| **设计阶段** | SA 系统分析智能体 | 需求矩阵设计、概要设计 | 需求矩阵、概要设计文档 |
+| **R1 Pre-Review** | DE + TE 联合 | R1 Pre-Review（冲突检测+影响分析+可行性评估） | 审核报告、修正需求、测试需求规格 |
+| **红阶段** | TE 测试智能体 | **黑盒测试用例**生成、测试脚本生成 | 失败的黑盒测试用例 |
+| **绿阶段** | DE 开发智能体 | 功能代码生成 | 通过黑盒测试的功能代码 |
+| **R2 Implementation Review** | DE + TE 联合 | R2 Implementation Review（Code Diff vs Spec/Knowledge/Feature 审查） | Pass/Fail + 问题清单 |
+| **白盒阶段** | TE 测试智能体 | **白盒测试用例**生成（基于实际代码） | 白盒测试用例 + 覆盖率报告 |
+| **重构阶段 + R3** | DE 开发智能体 | R3 Refactoring Review、冲突检测、影响分析 | 优化后的代码和配置（保持黑盒100% + 白盒≥80%） |
+
+---
+
+### 4.2 TDD 测试驱动开发详解
+
+**核心理念**：在编写功能代码之前，先编写测试用例。测试用例即需求的具体化表达，功能代码的编写目标就是让测试通过。
+
+```mermaid
+flowchart TB
+    subgraph PreR["⚪ R1 Pre-Review<br/>设计审查（红阶段前）"]
+        PR1[DE + TE 联合审查<br/>Spec + Knowledge + Feature + 当前代码]
+        PR2[可行性分析 / 冲突检测 / 影响评估]
+        PR3[输出：审核报告 + 修正需求 + 测试需求规格]
+        PR1 --> PR2 --> PR3
+    end
+
+    subgraph Red["🔴 红阶段：编写失败的测试"]
+        R1[TE 基于审核后的 Spec<br/>生成测试用例代码]
+        R2[测试执行 → 必然失败<br/>（功能代码尚未实现）]
+    end
+
+    subgraph Green["🟢 绿阶段：编写功能代码让测试通过"]
+        G1[DE 基于 Spec 概要设计<br/>生成功能代码]
+        G2[R2 Implementation Review<br/>Code Diff vs Spec/Knowledge/Feature]
+        G3[测试执行 → 目标通过]
+    end
+
+    subgraph Refactor["🟡 重构阶段：优化代码质量"]
+        F1[R3 Refactoring Review]
+        F2[检测 Feature 冲突/影响]
+        F3[优化代码结构<br/>保持测试通过]
+    end
+
+    PreR -->|通过| Red
+    Red -->|测试失败确认| Green
+    Green -->|R2 通过 + 测试通过| Refactor
+    Green -->|R2 Fail| Green
+    Refactor -->|新需求/新场景| PreR
+```
+
+#### TDD 三原则
+
+| 原则 | 说明 | 在本架构中的体现 |
+|------|------|-----------------|
+| **先写测试** | 任何功能代码之前，必须先有失败的测试用例 | TE 智能体在 DE 编码前生成测试用例代码；R1 Pre-Review 先行确认设计可行性与测试需求 |
+| **最小实现** | 只写刚好让测试通过的最少代码 | DE 智能体基于 Feature 配置生成精准的功能代码；R2 Implementation Review 确保实现不超范围 |
+| **持续重构** | 测试通过后立即重构，保持代码整洁 | DE 智能体调用 R3 Refactoring Review + 冲突检测 Skill 优化代码 |
+
+#### TDD 各阶段详解
+
+**🔴 红阶段：TE 先行，生成黑盒测试用例**
+
+```mermaid
+sequenceDiagram
+    actor SA
+    participant TE as TE 测试智能体
+    participant SkillBB as 黑盒测试用例生成Skill
+    participant SkillScript as 测试脚本生成Skill
+    participant FeatSvc as FeatureService
+    participant KnowSvc as KnowledgeService
+
+    SA->>TE: 传递：Spec + 概要设计 + Feature 配置
+    TE->>SkillBB: 调用黑盒测试用例生成Skill
+    SkillBB->>FeatSvc: 查询 Feature 边界条件
+    FeatSvc-->>SkillBB: 返回取值范围/类型/默认值
+    SkillBB->>KnowSvc: 查询平台约束规则
+    KnowSvc-->>SkillBB: 返回约束条件
+    SkillBB-->>TE: 返回黑盒测试用例代码
+
+    TE->>SkillScript: 调用测试脚本生成Skill
+    SkillScript-->>TE: 返回测试执行脚本
+
+    TE->>TE: 执行黑盒测试（预期失败）
+    TE-->>SA: 红阶段完成：黑盒测试用例就绪
+```
+
+| 输入 | 处理 | 输出 |
+|------|------|------|
+| Spec 验收标准 | TE 提取边界条件 | **黑盒测试用例代码**（JUnit/GTest等） |
+| Feature 配置（类型/范围/默认值） | TE 生成参数化测试 | 边界值测试/等价类测试 |
+| Knowledge 约束规则 | TE 生成异常场景测试 | 错误注入测试/兼容性测试 |
+
+> **黑盒测试特点**：不关注功能代码内部实现，仅验证输入→输出是否符合 Spec 预期。在功能代码编写前完成，作为 DE 的"完成标准"。
+
+**🟢 绿阶段：DE 实现，让黑盒测试通过**
+
+```mermaid
+sequenceDiagram
+    actor TE
+    participant DE as DE 开发智能体
+    participant SkillCode as 功能代码生成Skill
+    participant SkillGen as 配置生成Skill
+    participant SpecSvc as SpecService
+    participant FeatSvc as FeatureService
+
+    TE->>DE: 传递：黑盒测试用例 + Spec + 概要设计
+    DE->>SkillGen: 调用配置生成Skill
+    SkillGen->>SpecSvc: 解析 Spec 生成 Feature 配置
+    SpecSvc-->>SkillGen: 返回 Spec 结构
+    SkillGen->>FeatSvc: 创建/更新 Feature
+    FeatSvc-->>SkillGen: Feature 配置确认
+    SkillGen-->>DE: 返回 Feature 配置
+
+    DE->>SkillCode: 调用功能代码生成Skill
+    SkillCode->>SpecSvc: 查询概要设计接口定义
+    SpecSvc-->>SkillCode: 返回接口规范
+    SkillCode-->>DE: 返回功能代码
+
+    DE->>TE: 提交功能代码
+    TE->>TE: 执行黑盒测试（目标通过）
+    TE-->>DE: 黑盒测试通过 / 失败反馈
+```
+
+| 输入 | 处理 | 输出 |
+|------|------|------|
+| 失败的黑盒测试用例 | DE 分析失败原因 | 功能代码实现方案 |
+| Spec 概要设计 | DE 遵循接口定义 | 符合规范的源代码 |
+| Feature 配置 | DE 读取开关/参数 | 条件编译/运行时分支代码 |
+
+**失败回退机制**：
+- 黑盒测试失败 → DE 分析失败日志 → 定位 Spec/Feature/Code 不一致 → 修正后重新提交
+- 若发现 Spec 或 Feature 配置有误 → 反馈给 SA/BA 重新分析
+
+**⚪ 白盒阶段：TE 基于实际代码生成白盒测试用例**
+
+```mermaid
+sequenceDiagram
+    actor DE
+    participant TE as TE 测试智能体
+    participant SkillWB as 白盒测试用例生成Skill
+    participant SkillGraph as Code-Graph Skill
+    participant FeatSvc as FeatureService
+    participant CodeSvc as CodeGraphService
+
+    DE->>TE: 传递：功能代码 + 概要设计 + Feature 配置
+    TE->>SkillGraph: 调用 Code-Graph Skill
+    SkillGraph->>CodeSvc: 分析代码结构
+    CodeSvc-->>SkillGraph: 返回控制流图/分支信息
+    SkillGraph-->>TE: 返回代码依赖关系
+
+    TE->>SkillWB: 调用白盒测试用例生成Skill
+    SkillWB->>CodeSvc: 查询分支/路径/条件覆盖
+    CodeSvc-->>SkillWB: 返回代码度量数据
+    SkillWB->>FeatSvc: 查询 Feature 开关组合
+    FeatSvc-->>SkillWB: 返回有效组合
+    SkillWB-->>TE: 返回白盒测试用例代码
+
+    TE->>TE: 执行白盒测试（首次执行）
+    TE->>TE: 生成覆盖率报告
+    TE-->>DE: 白盒测试结果 + 覆盖率报告
+```
+
+| 输入 | 处理 | 输出 |
+|------|------|------|
+| 功能代码（实际实现） | TE 分析控制流/数据流 | 白盒测试用例代码 |
+| Code-Graph（代码依赖关系） | TE 识别未覆盖分支 | 分支覆盖/路径覆盖/条件覆盖用例 |
+| Feature 开关组合 | TE 生成条件组合测试 | MC/DC 覆盖用例 |
+
+**白盒测试质量门禁**：
+| 指标 | 阈值 | 处理策略 |
+|------|------|----------|
+| **分支覆盖率** | ≥ 80% | 未达标 → DE 补充功能代码或调整实现 |
+| **语句覆盖率** | ≥ 90% | 未达标 → 识别遗漏执行路径 |
+| **MC/DC 覆盖率** | ≥ 100%（关键模块） | 未达标 → 补充条件组合测试 |
+| **路径覆盖率** | 按模块定义 | 未达标 → 简化复杂路径或增加用例 |
+
+**白盒失败回退机制**：
+- 覆盖率未达标 → TE 输出未覆盖分支清单 → DE 分析原因（代码不可达/缺少实现/用例不足）
+- 若代码逻辑存在缺陷 → DE 修复代码 → TE 重新执行白盒测试
+- 若发现 Spec 与代码实现不一致 → 反馈 SA 更新设计文档
+
+**🟡 重构阶段：DE 优化，保持双测试通过**
+
+```mermaid
+sequenceDiagram
+    participant DE as DE 开发智能体
+    participant SkillReview as Code-Review Skill
+    participant SkillCheck as 合规校验Skill
+    participant KnowSvc as KnowledgeService
+    participant FeatSvc as FeatureService
+
+    DE->>SkillReview: 调用 Code-Review Skill
+    SkillReview->>KnowSvc: 查询最佳实践/历史案例
+    KnowSvc-->>SkillReview: 返回审查规则
+    SkillReview-->>DE: 返回 Review 报告
+
+    DE->>SkillCheck: 调用合规校验Skill
+    SkillCheck->>FeatSvc: 验证 Feature 组合
+    FeatSvc-->>SkillCheck: 返回验证结果
+    SkillCheck->>KnowSvc: 查询约束规则
+    KnowSvc-->>SkillCheck: 返回规则匹配
+    SkillCheck-->>DE: 返回合规报告
+
+    DE->>DE: 执行重构优化
+    DE->>TE: 请求回归测试
+    TE-->>DE: 黑盒 100% 通过 + 白盒 ≥ 80% 覆盖（重构成功）
+```
+
+| 检查项 | 工具/Skill | 目标 |
+|--------|-----------|------|
+| 代码规范 | Code-Review Skill | 符合编码规范、命名规范 |
+| Feature 合规 | 合规校验 Skill | 配置与 Spec/Knowledge 一致 |
+| 冲突检测 | 冲突检测 Skill | 无依赖/互斥冲突 |
+| 影响分析 | 影响分析 Skill | 变更范围可控 |
+| 黑盒回归 | TE 测试执行 | 黑盒通过率 100% |
+| 白盒回归 | TE 测试执行 | 白盒覆盖率 ≥ 80% |
+
+#### TDD 与 Feature/Spec/Knowledge 的关系
+
+```mermaid
+flowchart TB
+    subgraph Input["TDD 输入"]
+        S[Spec：定义做什么]
+        F[Feature：配置管理]
+        K[Knowledge：约束规则]
+    end
+
+    subgraph TDD["TDD 循环"]
+        R[🔴 红阶段：TE 生成黑盒测试]
+        G[🟢 绿阶段：DE 实现功能]
+        W[⚪ 白盒阶段：TE 生成白盒测试]
+        Y[🟡 重构阶段：DE 优化]
+    end
+
+    subgraph Output["TDD 输出"]
+        C[Code：功能代码]
+        BB[Test：黑盒测试用例]
+        WB[Test：白盒测试用例]
+        V[Verification：验证报告]
+    end
+
+    S -->|验收标准| R
+    F -->|边界条件| R
+    K -->|约束规则| R
+
+    S -->|接口定义| G
+    F -->|开关/参数| G
+    K -->|平台规则| G
+
+    C -->|代码结构| W
+    F -->|开关组合| W
+    K -->|覆盖率标准| W
+
+    K -->|最佳实践| Y
+    F -->|依赖关系| Y
+
+    G --> C
+    R --> BB
+    W --> WB
+    Y --> V
+```
+
+| TDD 阶段 | Spec 的作用 | Feature 的作用 | Knowledge 的作用 |
+|----------|-------------|----------------|------------------|
+| **R1 Pre-Review** | 提供需求基准，被审查其完整性、一致性与可行性 | 提供当前 Feature 配置上下文，检测新需求与现有 Feature 的冲突 | 提供约束规则与平台知识，评估实现可行性与合规风险 |
+| **红阶段（黑盒）** | 提供验收标准，定义"完成"的判定条件 | 提供边界值、类型、范围，生成参数化测试 | 提供异常场景、兼容性要求，生成负面测试 |
+| **绿阶段 + R2** | 提供接口定义和实现逻辑；R2 对比 Code Diff 检查实现一致性 | 提供编译/运行时的条件分支；R2 检查 Feature 配置是否被正确实现 | 提供平台适配规则；R2 检查实现是否遵循 Knowledge 约束 |
+| **白盒阶段** | 校验代码实现与设计文档的一致性 | 提供 Feature 开关组合，生成条件覆盖测试 | 提供覆盖率标准（分支≥80%）、MC/DC 要求 |
+| **重构阶段 + R3** | 校验重构后仍满足需求；检查是否引入 Spec 未定义的功能 | 校验重构后配置仍然有效；分析 Feature 变更的波及范围 | 提供最佳实践与历史案例，指导重构方向；R3 进行最终合规审查 |
+
+### 4.2 逆向分析链路
+
+```mermaid
+flowchart LR
+    subgraph CodeChange["代码变更输入"]
+        C1[Git Commit/Diff]
+    end
+
+    subgraph Graph["代码图谱分析"]
+        C1 -->|Code-Graph Skill| C2[代码知识图谱]
+        C2 -->|Code-Diff Skill| C3[变更影响分析]
+    end
+
+    subgraph TestAssoc["测试关联"]
+        C3 -->|Diff-Test关联Skill| C4[回归测试集]
+    end
+
+    subgraph Review["智能审查"]
+        C3 -->|Code-Review Skill| C5[Review报告]
+        C5 -->|关联Feature| C6[Feature合规性]
+        C5 -->|关联Spec| C7[Spec一致性]
+        C5 -->|关联Knowledge| C8[标准/协议合规性]
+    end
+
+    CodeChange --> Graph --> TestAssoc
+    Graph --> Review
+```
+
+### 4.3 双向闭环：正向 ↔ 逆向
+
+```mermaid
+flowchart TB
+    subgraph Forward["正向开发"]
+        F1[需求分析]
+        F2[Feature配置]
+        F3[代码实现]
+        F4[测试用例]
+    end
+
+    subgraph Reverse["逆向分析"]
+        R1[Code-Graph]
+        R2[Code-Diff]
+        R3[Diff-Test关联]
+        R4[Code-Review]
+    end
+
+    F1 --> F2 --> F3 --> F4
+    R1 --> R2 --> R3
+    R2 --> R4
+
+    F3 -.->|构建图谱| R1
+    R4 -.->|反馈修正| F2
+    R3 -.->|补充用例| F4
+```
+
+**闭环价值**：
+- 正向生成的代码自动构建 Code-Graph，为逆向分析提供基础
+- Code-Review 发现的问题反馈到 Feature 层，驱动配置修正
+- Diff-Test 关联发现遗漏的测试场景，补充到测试用例集
+
+---
+
+## 五、关键设计机制
+
+### 5.1 双向追溯机制
+
+```mermaid
+flowchart LR
+    subgraph SpecSide["Spec 侧"]
+        SP[SPEC_2024_DISPLAY_001]
+        SP -->|section 3.2.1| B1[FEATURE_HDR_ENABLE]
+        SP -->|section 3.2.2| B2[FEATURE_HDR_TONEMAP]
+        SP -->|section 3.2.3| B3[FEATURE_HDR_USER_CTRL]
+    end
+
+    subgraph FeatureSide["Feature 侧"]
+        F1[FEATURE_HDR_ENABLE]
+        F2[FEATURE_HDR_TONEMAP]
+        F3[FEATURE_HDR_USER_CTRL]
+        F1 -->|specBindings| SP
+        F2 -->|specBindings| SP
+        F3 -->|specBindings| SP
+    end
+```
+
+**价值**：
+- 当 Spec 变更时，快速定位受影响的 Feature
+- 当 Feature 被质疑时，快速找到需求依据
+- 审计时，证明每个 Feature 都有需求来源
+
+### 5.2 版本一致性机制
+
+```mermaid
+stateDiagram-v2
+    [*] --> SpecV1: 创建 Spec v1.0
+    SpecV1 --> FeaturesDraft: 生成 Feature 草案
+    FeaturesDraft --> FeaturesActive: 评审通过
+    FeaturesActive --> SpecV2: Spec 升级到 v2.0
+    SpecV2 --> FeaturesReeval: 触发重新评估
+    FeaturesReeval --> FeaturesActive: 无影响
+    FeaturesReeval --> FeaturesModified: 需要调整
+    FeaturesModified --> FeaturesActive: 调整完成
+```
+
+**规则**：
+- Spec 版本变更时，自动触发关联 Feature 的**重新评估**
+- Feature 修改时，校验是否仍满足绑定 Spec 的约束
+- 保留历史版本，支持回溯和对比
+
+### 5.3 Spec ↔ Knowledge 双向转化机制
+
+```mermaid
+flowchart TB
+    subgraph SpecSide["Spec 侧"]
+        S1[原始需求文档]
+        S2[需求规格]
+        S3[概要设计]
+    end
+
+    subgraph Transform["转化引擎"]
+        T1[标准/协议提取]
+        T2[平台约束归纳]
+        T3[规则模板生成]
+        T4[合规检查注入]
+    end
+
+    subgraph KnowledgeSide["Knowledge 侧"]
+        K1[行业与标准知识]
+        K2[技术栈知识]
+        K3[平台差异知识]
+        K4[约束规则库]
+    end
+
+    subgraph Apply["知识应用"]
+        U1[配置生成]
+        U2[冲突检测]
+        U3[合规校验]
+        U4[Spec模板生成]
+    end
+
+    SpecSide -->|提取沉淀| Transform
+    Transform -->|存储| KnowledgeSide
+    KnowledgeSide -->|反向生成| Transform
+    Transform -->|注入| SpecSide
+    KnowledgeSide --> Apply
+    Apply -->|反馈| SpecSide
+```
+
+**转化示例**：
+
+| 方向 | 触发条件 | 过程 | 结果 |
+|------|----------|------|------|
+| **Spec → Knowledge** | 解析 `SPEC_2024_DV_001` 时发现 Dolby Vision 兼容要求 | 提取标准条款 → 规则化 → 置信度评估 | 生成 `KNOW_DV_STANDARD_001` |
+| **Knowledge → Spec** | 创建新的 HDMI 功能 Spec | 查询 Knowledge 中 HDMI 相关规则 → 注入到 Spec 设计章节 | 新 Spec 自动包含 HDCP/VSIF 要求 |
+| **多 Spec → Knowledge** | 3 个 MTK 项目的 Spec 都提到 HDR 路径要求 | 模式匹配 → 归纳共性 → 抽象为平台规则 | 生成 `KNOW_MTK_HDR_001` |
+
+**示例**：每次人工解决冲突后，系统询问："是否将规则 `FEATURE_A 与 FEATURE_B 互斥` 加入 Knowledge？"
+
+#### Feature/Spec/Knowledge 动态同步机制
+
+实现三者间的自动、可追溯、事件驱动的双向同步：
+
+```mermaid
+flowchart LR
+    subgraph Events["事件总线 (Event Bus)"]
+        EV[变更事件]
+    end
+
+    subgraph Spec["📋 Spec 变更"]
+        SP1[新增 Spec]
+        SP2[修改 Spec]
+        SP3[删除 Spec]
+        SP4[Spec 版本升级]
+    end
+
+    subgraph Feature["⚙️ Feature 变更"]
+        F1[创建 Feature]
+        F2[修改 Feature<br/>范围/类型/默认值]
+        F3[废弃/删除 Feature]
+    end
+
+    subgraph Knowledge["🧠 Knowledge 变更"]
+        K1[新增 Knowledge]
+        K2[置信度升降级]
+        K3[Knowledge 版本更新]
+    end
+
+    subgraph Sync["同步引擎"]
+        S1[Spec→Knowledge 提取器]
+        S2[Feature→Knowledge 归纳器]
+        S3[Knowledge→Spec 注入器]
+        S4[Knowledge→Feature 合规检查器]
+    end
+
+    subgraph Version["版本化追溯"]
+        V1[(变更日志<br/>source_version<br/>target_version<br/>timestamp)]
+        V2[一致性快照]
+    end
+
+    Spec -->|产生事件| Events
+    Feature -->|产生事件| Events
+    Knowledge -->|产生事件| Events
+
+    Events -->|触发| Sync
+    Sync -->|写入| Version
+    Version -->|通知| Spec
+    Version -->|通知| Feature
+    Version -->|通知| Knowledge
+```
+
+**同步规则矩阵**：
+
+| 触发器 | 同步动作 | 目标 | 示例 |
+|--------|----------|------|------|
+| **Spec 新增** | 提取标准条款 → 生成 Knowledge 条目 | Knowledge | `SPEC_DV_001 v1.0` → 生成 `KNOW_DV_STANDARD_001` (置信度 `medium`) |
+| **Spec 修改** | 对关联 Knowledge 重新提取 → 版本对比 → 通知人工确认差异 | Knowledge | `SPEC_DV_001 v1.0→v2.0` → `KNOW_DV_STANDARD_001` 进入 `re-evaluate` 状态 |
+| **Spec 删除** | 关联 Knowledge 标记为 `deprecated`（不级联删除，保留追溯） | Knowledge | Spec 下线 → Knowledge 仍可查询但标记已过期来源 |
+| **Feature 创建** | 查询 Knowledge → 自动注入关联规则 → 生成合规检查报告 | Spec / Knowledge | 新建 `FEATURE_DOLBY_VISION` → 自动注入依赖 `FEATURE_HDR_ENABLE` |
+| **Feature 修改** | 重新校验所有关联的 Knowledge 约束 → 生成影响报告 | Knowledge | `FEATURE_HDR_TONEMAP` 枚举变更 → 校验 Knowledge 中引用该枚举的规则 |
+| **Knowledge 新增** | 扫描全量 Feature → 检查是否有新增约束应追加 → 生成差异报告 | Feature | 新增 `KNOW_MTK_HDR_002` → 扫描发现 MTK 平台 HDR Feature 缺少对应配置 |
+| **Knowledge 置信度升级** | 关联约束进入"自动同步"白名单（`low`→`high` 时触发） | Feature | `KNOW_MTK_HDR_001` 置信度 `low→high` → 自动为未配置的 MTK 项目 Feature 追加约束 |
+| **冲突解决沉淀** | 将解决方案写入 Knowledge + 标记来源 | Knowledge | 人工解决 Feature A/B 互斥冲突 → 系统提示"是否沉淀为 Knowledge？" → 生成 `KNOW_MUTEX_NEW` |
+
+**版本化追溯原理**：
+
+```mermaid
+sequenceDiagram
+    participant User as 用户/Agent
+    participant EB as 事件总线
+    participant SyncEngine as 同步引擎
+    participant VL as 版本日志
+    participant CS as 一致性校验器
+
+    User->>EB: 修改 Spec v1.1 → v2.0
+    EB->>SyncEngine: 触发 SpecChanged 事件
+
+    SyncEngine->>SyncEngine: Spec→Knowledge 提取
+    SyncEngine->>VL: 记录 changelog<br/>{source: SPEC_DV_001@v2.0<br/> action: extract<br/> target: KNOW_DV_STANDARD_001<br/> timestamp, diff_hash}
+
+    SyncEngine->>CS: 一致性校验请求
+    CS->>CS: 校验 Feature 是否仍满足新 Spec
+    CS-->>User: 报告: 3 个 Feature 需重新评估
+
+    User->>User: 人工确认调整
+
+    alt 用户调整 Feature
+        User->>VL: 记录 Feature 变更版本
+        User->>CS: 重新校验通过
+        CS-->>User: 一致性快照已保存
+    else 用户回滚 Spec
+        User->>VL: 回滚记录
+        User-->>User: Spec 恢复 v1.1
+    end
+```
+
+**版本日志结构**（每条记录包含）：
+
+| 字段 | 示例 | 说明 |
+|------|------|------|
+| `event_id` | `ev_20240710_001` | 唯一 ID |
+| `source_type` | `spec` | 变更源：`spec` / `feature` / `knowledge` |
+| `source_version` | `SPEC_DV_001@v2.0` | 变更源版本 |
+| `target_type` | `knowledge` | 同步目标类型 |
+| `target_version` | `KNOW_DV_STANDARD_001@v3` | 同步后目标版本 |
+| `action` | `extract` | 同步动作：`extract` / `inject` / `deprecate` / `re-evaluate` |
+| `diff_hash` | `a1b2c3d4` | 变更内容指纹 |
+| `consistency_status` | `passed` | 一致性状态：`passed` / `failed` / `pending_review` |
+| `timestamp` | `2024-07-10T10:00:00Z` | 时间戳 |
+
+**一致性快照**：每次同步完成后，生成当期 Spec/Feature/Knowledge 三者关系统一快照，命名格式 `{Spec version}_{Feature snapshot}_{Knowledge version}.snap`，支持 `git-like checkout` 回溯到任意历史状态。
+
+---
+
+## 六、总结：一句话定义
+
+| 概念 | 一句话定义 | 类比 |
+|------|-----------|------|
+| **Agent** | 面向业务场景的**智能体**：BA 业务分析、SA 系统分析、DE 开发（基于 TDD）、TE 测试 | **项目经理 + 任务调度器** |
+| **Skill** | 原子化的**能力单元**（业务 Skill + 数据操作 Skill），由 Agent 编排 | **原子能力 + 数据操作 Skill 驱动** |
+| **Feature** | **Spec 的系统能力化表达**，基于 Android SystemFeatures 实现代码隔离（开关、参数、依赖、作用域） | **Spec → SystemFeature 映射** |
+| **Spec** | 需求输入的契约和基准，**与 Knowledge 双向转化** | **API 文档 + 知识提取源** |
+| **Knowledge** | 可复用的领域规则和经验，**与 Spec 双向转化** | **业务规则引擎 + 模板库** |
+| **Code** | **Feature 隔离代码路径**，**Spec 决定代码实现**，分功能/测试/脚本三类 | **实现 + 验证 + 自动化** |
+
+**架构收益**：
+1. **Agent 编排 Skill**：面向业务场景的智能体，灵活组合原子能力，降低用户使用门槛
+2. **Skill 驱动数据操作 Skill**：业务 Skill 通过数据操作 Skill（FeatureService/SpecService/KnowledgeService/CodeGraphService）读写数据，便于独立扩展和测试
+3. **Feature** 作为配置管理中枢，统一管理能力的生命周期与作用域
+4. **Spec** 和 **Knowledge** 双向转化，知识持续沉淀，需求快速生成
+5. **Code** 作为最终产物，功能代码、测试用例代码、测试脚本形成"实现-验证-自动化"闭环
+6. 支持从需求到配置的**全链路自动化**和**智能决策**
+7. 行业标准与技术栈知识的沉淀，确保配置的**合规性**和**技术正确性**
+
+</script>
+<script>
+(function() {
+  var mdText = document.getElementById('md-source').textContent;
+  var html = marked.parse(mdText);
+  document.getElementById('root').innerHTML = html;
+
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'default',
+    securityLevel: 'loose',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+    sequence: { useMaxWidth: true, showSequenceNumbers: false }
+  });
+
+  document.querySelectorAll('pre code.language-mermaid').forEach(function(codeEl) {
+    var diagramText = codeEl.textContent.trim();
+    var pre = codeEl.parentNode;
+    var wrapper = document.createElement('div');
+    wrapper.className = 'mermaid-box';
+    var div = document.createElement('div');
+    div.className = 'mermaid';
+    div.textContent = diagramText;
+    wrapper.appendChild(div);
+    pre.parentNode.replaceChild(wrapper, pre);
+  });
+
+  mermaid.run({ nodes: document.querySelectorAll('.mermaid') }).catch(function(e) {
+    console.warn('Mermaid error:', e);
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var id = this.getAttribute('href').substring(1);
+      var target = document.getElementById(id);
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

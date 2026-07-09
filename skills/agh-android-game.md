@@ -20,8 +20,8 @@ Android 原生游戏开发。可通过 `/agh-android-game` 快捷触发（自动
 | 阶段      | 集成行为                                                                                                 |
 | ------- | ---------------------------------------------------------------------------------------------------- |
 | clarify | 自动设置 output_type=library, test_strategy=unit, tech_stack.language=java, tech_stack.build_tool=gradle |
-| propose | SA 方案中包含native C++ → + Kotlin 胶水层设计；TE 测试用例包含 GTest 单元测试 + JUnit                                     |
-| apply   | DE 实现包含 C++ 核心逻辑 + Kotlin 胶水层，TE 使用 `gradle test` + `ctest` 双通道验证                                    |
+| propose | SA 方案中包含native C++ → + Kotlin 胶水层设计（调用 CodeGraphService 分析现有代码结构）；TE 测试用例包含 GTest 单元测试 + JUnit                                     |
+| apply   | DE 实现包含 C++ 核心逻辑 + Kotlin 胶水层（TDD 循环含 R1/R2/R3 三阶段 Code-Review），TE 使用 `gradle test` + `ctest` 双通道验证                                    |
 | archive | 额外归档 so 构建产物→ output/lib/                                                                            |
 
 
@@ -72,21 +72,25 @@ Android 原生游戏开发。可通过 `/agh-android-game` 快捷触发（自动
 1. `[PM] 派发 DE 实现任务`
 2. 写入 handoff:
 - 白名单：`docs/` 下相关行业标准文件, `output/{feature-name}/specs/design.md`, `output/{feature-name}/specs/proposal.md`, `app/src/main/cpp/`, `app/src/main/java/`
+- 数据操作 Skill: **FeatureService**（Feature 配置）、**SpecService**（规格读取）、**KnowledgeService**（Android 游戏技术栈约束 → LLM Wiki + 关系图谱）、**CodeGraphService**（C++/Kotlin 代码结构分析 → L1 静态索引 Clang AST + L2 语义）
 - 期望输出: `output/{feature-name}/`, 修改 `app/src/main/cpp/` → `app/src/main/java/` 下源码
-- 约束: TDD 模式，基于 `docs/` 标准进行编码；C++ 部分析GTest，Kotlin 部分析JUnit；dev-test 使用 `gradle test`
-3. 派发任务: DE（DE 需先阅读 `docs/` 中相关技术标准文档再进行编码。
+- 约束: TDD 模式（R1 Pre-Review → 红 → 绿 + R2 → 白盒 → 重构 + R3），基于 `docs/` 标准进行编码；C++ 部分用 GTest，Kotlin 部分用 JUnit；dev-test 使用 `gradle test`
+3. 派发任务: DE（DE 需先阅读 `docs/` 中相关技术标准文档再进行编码，DE Agent 编排：配置生成 → R1 Pre-Review → 功能代码生成 → R2 Implementation Review → 冲突检测 → 合规校验 → R3 Refactoring Review）
 4. 接收回报，校验
 - 输出文件存在
 - `gradle test` 通过
 - GTest 编译且运行通过
+- 三阶段 Code-Review 记录完整（R1/R2/R3）
 
 ### TE 校验规则
 
-TE 阅读 `docs/` 下测试和质量标准文档（`docs/testing-qa.md`, `docs/performance-baseline.md`），对照标准设计测试用例和执行审计
-TE 使用双通道验证- **C++ → *: `cd app && cmake -DBUILD_TESTS=ON .. && ctest` → 验证 GTest 测试
-
+TE 阅读 `docs/` 下测试和质量标准文档（`docs/testing-qa.md`, `docs/performance-baseline.md`），对照标准设计测试用例和执行审计。
+TE Agent 编排：黑盒测试用例生成 Skill（红阶段，调用 FeatureService 边界条件）→ 白盒测试用例生成 Skill（白盒阶段，调用 CodeGraphService L1 CFG/分支 + FeatureService MC/DC）→ 测试执行 Skill → 缺陷分析 Skill。
+TE 使用双通道验证：
+- **C++**: `cd app && cmake -DBUILD_TESTS=ON .. && ctest` → 验证 GTest 测试
 - **Kotlin**: `cd app && gradle test` → 验证 JUnit 测试
 - **构建验证**: `cd app && gradle assembleDebug` → 确认 APK 可构建
+- **覆盖率**: 黑盒通过率 100% + 白盒分支覆盖率 ≥ 80%
 
 ### 性能基准校验（如适用）
 

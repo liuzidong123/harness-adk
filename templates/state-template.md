@@ -39,7 +39,12 @@ test_strategy: ""              # e2e | unit | integration | smoke | manual | non
 
 # === 环境信息 ===
 env:
-  browser_available: false     # 浏览。?E2E 环境是否可用
+  browser_available: false     # 浏览器/E2E 环境是否可用
+  # === 数据操作 Skill 可用性（clarify 阶段检测）===
+  feature_service: false       # FeatureService 是否可用（Feature 存储）
+  spec_service: false          # SpecService 是否可用（openspec/specs/ 存在）
+  knowledge_service: false     # KnowledgeService 是否可用（LLM Wiki + 关系图谱）
+  code_graph_service: false    # CodeGraphService 是否可用（Git + Clang 工具链）
 
 # === 元数据===
 last_updated: ""               # ISO 8601 UTC 时间戳，每次更新必须同步刷新
@@ -59,11 +64,17 @@ last_updated: ""               # ISO 8601 UTC 时间戳，每次更新必须同�
 | propose | PLAN | PM 计划编排 | PM |
 | propose | UX | UX 视觉设计 (→ output_type) | UX |
 | propose | PROPOSE-DONE | propose 阶段完成 | PM |
-| apply | DEV-B{N} | DE 批量开发Batch-N | DE |
-| apply | TEST-1-{N} | TE 逐批次审批Batch-N | TE |
+| apply | R1-{N} | DE+TE R1 Pre-Review（红阶段前）Batch-N | DE+TE |
+| apply | RED-{N} | TE 黑盒测试生成（红阶段）Batch-N | TE |
+| apply | DEV-B{N} | DE 批量开发（绿阶段）Batch-N | DE |
+| apply | R2-{N} | DE R2 Implementation Review（绿→白盒间）Batch-N | DE |
+| apply | WB-{N} | TE 白盒测试生成（白盒阶段）Batch-N | TE |
+| apply | R3-{N} | DE R3 Refactoring Review（重构阶段）Batch-N | DE |
+| apply | TEST-1-{N} | TE 逐批次审计Batch-N | TE |
 | apply | SR2-DONE | SR2 功能评审通过 | PM |
 | apply | TEST-2 | TE 最终审计| TE |
 | apply | SR3-DONE | SR3 最终评审通过 | PM |
+| apply | SPEC-GENERATED | PM Spec 文档生成 + 一致性快照 | PM |
 | archive | ARC-1 | 需求归档(→ full) | PM |
 | archive | ARC-2 | 设计归档 (standard/full) | PM |
 | archive | ARC-3 | 产出物归档| PM |
