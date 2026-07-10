@@ -124,7 +124,7 @@ flowchart TB
     subgraph Feature["⚙️ Feature 层 — SystemFeatures 声明"]
         F1["FEATURE_HDR_ENABLE<br/>com.tcl.feature.hdr_enable"]
         F2["FEATURE_HDR_TONEMAP<br/>com.tcl.feature.hdr_tonemap"]
-        F3["FEATURE_MTK_HDR_PATH<br/>com.tcl.feature.mtk_hdr_path"]
+        F3["FEATURE_SOC_HDR_PATH<br/>com.tcl.feature.soc_hdr_path"]
     end
 
     subgraph Android["🤖 Android 系统 — 三态验证"]
@@ -142,7 +142,7 @@ flowchart TB
 |-----------|----------|--------------|------|
 | **需求规格**（做什么） | 能力开关 | `FEATURE_{能力}_ENABLE` | `FEATURE_HDR_ENABLE` ← Spec 3.2.1 |
 | **需求规格**（参数范围） | 能力参数 | `FEATURE_{能力}_{参数}` | `FEATURE_HDR_TONEMAP` ← Spec 3.2.2 |
-| **概要设计**（平台适配） | 平台路径 | `FEATURE_{平台}_{能力}` | `FEATURE_MTK_HDR_PATH` ← Spec 2.1 |
+| **概要设计**（平台适配） | 平台路径 | `FEATURE_{平台}_{能力}` | `FEATURE_SOC_HDR_PATH` ← Spec 2.1 |
 | **需求矩阵** | 追溯绑定 | `specBindings` | Feature 绑定到 Spec 条目 |
 
 **Android SystemFeatures 三态验证机制**：
@@ -159,7 +159,7 @@ flowchart TB
 | **能力开关** | 某项功能是否启用 | XML 声明 + 运行时查询 | `FEATURE_HDR_ENABLE = true` |
 | **能力参数** | 功能的具体工作模式 | Feature 关联的配置项 | `FEATURE_HDR_TONEMAP = "AUTO"` |
 | **依赖管理** | 能力间的启用先后/互斥关系 | Feature 的 `relations` 定义 | `FEATURE_HDR_MODE` 依赖 `FEATURE_HDR_ENABLE` |
-| **作用域管理** | 能力生效的平台/版本/机型范围 | 不同机型的 XML 文件差异 | MTK 平台声明 `FEATURE_MTK_HDR_PATH` |
+| **作用域管理** | 能力生效的平台/版本/机型范围 | 不同机型的 XML 文件差异 | SOC 平台声明 `FEATURE_SOC_HDR_PATH` |
 | **生命周期** | 配置项从创建到废弃的流转 | Feature 状态管理 | 草稿 → 评审中 → 已生效 → 已废弃 |
 | **需求溯源** | 配置与需求文档的双向追溯 | `specBindings` 绑定 | 绑定到 `SPEC_DISPLAY_001` 第 3.2.1 节 |
 
@@ -235,7 +235,7 @@ flowchart TB
         F1[FEATURE_HDR_ENABLE<br/>type: bool]
         F2["FEATURE_HDR_TONEMAP<br/>type: enum<br/>range: [OFF, AUTO, FORCE_SDR]"]
         F3[FEATURE_HDR_USER_CTRL<br/>type: bool]
-        F4[FEATURE_MTK_HDR_PATH<br/>type: bool<br/>scope: MTK]
+        F4[FEATURE_SOC_HDR_PATH<br/>type: bool<br/>scope: SOC]
     end
 
     S1 -->|能力开关| M1
@@ -255,7 +255,7 @@ flowchart TB
 | **功能需求**（做什么） | 生成 `FEATURE_{能力}_ENABLE` 开关 | Spec 3.2.1 "支持 HDR10" → `FEATURE_HDR_ENABLE` |
 | **参数需求**（取值范围） | 生成 `FEATURE_{能力}_{参数}` 枚举/整型 | Spec 3.2.2 "Tone Mapping" → `FEATURE_HDR_TONEMAP` |
 | **用户控制需求** | 生成独立的用户控制开关 | Spec 3.2.3 "用户手动开关" → `FEATURE_HDR_USER_CTRL` |
-| **平台适配设计** | 生成 `FEATURE_{平台}_{能力}` 平台特定 Feature | Spec 2.1 "MTK HAL 接口" → `FEATURE_MTK_HDR_PATH` |
+| **平台适配设计** | 生成 `FEATURE_{平台}_{能力}` 平台特定 Feature | Spec 2.1 "SOC HAL 接口" → `FEATURE_SOC_HDR_PATH` |
 | **互斥/依赖设计** | 生成 Feature `relations` 定义 | Spec 设计章节 "HDR 依赖 HDMI 2.1" → `FEATURE_HDR_ENABLE` 依赖 `FEATURE_HDMI_2_1` |
 
 **Spec → Feature 变更联动**：
@@ -271,14 +271,14 @@ flowchart TB
 |------|------|------|
 | **标准文档解析** | 从 Spec 中提取行业标准条款，沉淀为 Knowledge | `SPEC_2024_DV_001` 中的 Dolby Vision 兼容要求 → `KNOW_DV_STANDARD_001` |
 | **协议约束提取** | 从 Spec 的概要设计中提取技术栈约束 | HDMI VSIF 发送要求 → `KNOW_HDMI_PROTOCOL_001` |
-| **平台适配总结** | 从多个项目 Spec 中归纳平台差异 | 多个 MTK 项目 Spec 中重复的 HDR 路径要求 → `KNOW_MTK_HDR_001` |
+| **平台适配总结** | 从多个项目 Spec 中归纳平台差异 | 多个 SOC 项目 Spec 中重复的 HDR 路径要求 → `KNOW_SOC_HDR_001` |
 
 **Knowledge → Spec 转化**：
 | 场景 | 过程 | 示例 |
 |------|------|------|
 | **模板生成** | 基于 Knowledge 中的标准规则，生成新 Spec 的模板 | 新项目的 HDMI 功能 Spec 自动包含 HDCP 2.2 要求 |
 | **合规检查** | 用 Knowledge 规则校验 Spec 完整性 | 检查新 Spec 是否遗漏 Dolby Vision 的 HDR10 兼容条款 |
-| **约束注入** | 将 Knowledge 中的平台约束写入 Spec 的设计章节 | 自动在概要设计中添加 MTK HDR 路径要求 |
+| **约束注入** | 将 Knowledge 中的平台约束写入 Spec 的设计章节 | 自动在概要设计中添加 SOC HDR 路径要求 |
 
 ```mermaid
 erDiagram
@@ -348,12 +348,12 @@ mindmap
         OMX与Codec2接口差异
         TIF会话生命周期管理
     平台差异知识
-      MTK平台
-        HDR需同时开启FEATURE_MTK_HDR_PATH
+      SOC1平台
+        HDR需同时开启FEATURE_SOC_HDR_PATH
         4K场景下SCALER_MODE不能为LEGACY
-      RTK平台
+      SOC2平台
         待机唤醒时序与AML不同
-      AML平台
+      SOC3平台
         HDMI AVI包处理有特有逻辑
     约束规则库
       互斥规则
@@ -365,8 +365,8 @@ mindmap
       标准合规规则
         支持Dolby Vision必须同时支持HDR10
     历史案例库
-      T966D5CN-7901: TIF超时根因分析
-      LINTHY-43627: ANR问题解决方案
+      CASE1: TIF超时根因分析
+      CASE2: ANR问题解决方案
     最佳实践库
       Feature命名规范
       默认值设置建议
@@ -377,7 +377,7 @@ mindmap
 |----------|------|------|
 | **行业与标准知识** | HDR10 使用 SMPTE ST 2084 EOTF；Dolby Vision 需动态元数据 | 标准文档 |
 | **技术栈知识** | HDMI HDCP 2.3 握手失败会导致 FEATURE_HDCP_ENABLE 回退 | 技术规范 |
-| **平台知识** | MTK 平台 HDR 特性需要同时开启 `FEATURE_HDR_ENABLE` 和 `FEATURE_MTK_HDR_PATH` | 平台适配经验 |
+| **平台知识** | SOC 平台 HDR 特性需要同时开启 `FEATURE_HDR_ENABLE` 和 `FEATURE_SOC_HDR_PATH` | 平台适配经验 |
 | **约束规则** | 如果 `FEATURE_4K_ENABLE=true`，则 `FEATURE_SCALER_MODE` 不能为 `LEGACY` | 技术规范 |
 | **历史案例** | 某机型因 Feature 冲突导致 TIF 超时，解决方案是... | 问题复盘 |
 | **最佳实践** | Android 14 后 `FEATURE_AI_UPSCALER` 推荐默认开启 | 专家经验 |
@@ -407,7 +407,7 @@ flowchart TB
         G1[依赖规则<br/>FEATURE_DV → FEATURE_HDR_ENABLE]
         G2[互斥规则<br/>FEATURE_AI_UPSCALER ⟂ FEATURE_LEGACY_SCALER]
         G3[版本规则<br/>FEATURE_AI_UPSCALER ≥ Android 14]
-        G4[平台规则<br/>MTK → FEATURE_MTK_HDR_PATH]
+        G4[平台规则<br/>SOC → FEATURE_SOC_HDR_PATH]
         G5[值约束<br/>FEATURE_HDCP_VERSION ≥ 2.2]
     end
 
@@ -478,7 +478,7 @@ sequenceDiagram
     participant Graph as 关系图谱层
     participant Wiki as LLM Wiki 层
 
-    App->>KS: 激活上下文<br/>(SpecID=SPEC_2024_DISPLAY_001, Platform=MTK)
+    App->>KS: 激活上下文<br/>(SpecID=SPEC_2024_DISPLAY_001, Platform=SOC)
 
     Note over KS: 阶段1: 预取预热（异步，不阻塞）
     KS->>Cache: 检查 L1 是否命中
@@ -488,8 +488,8 @@ sequenceDiagram
     Graph-->>KS: 返回依赖/互斥规则列表
     KS->>Cache: 写入 L2 上下文缓存
 
-    KS->>Wiki: 语义检索相关文本<br/>(MTK HDR 最佳实践)
-    Wiki-->>KS: 返回 KNOW_MTK_HDR_001
+    KS->>Wiki: 语义检索相关文本<br/>(SOC HDR 最佳实践)
+    Wiki-->>KS: 返回 KNOW_SOC_HDR_001
     KS->>Cache: 写入 L2 上下文缓存
 
     Note over KS: 阶段2: 业务查询（同步）
@@ -524,7 +524,7 @@ flowchart TB
     subgraph FeatureLayer["⚙️ Feature 层 — 决定'编译/运行什么'"]
         F1[FEATURE_HDR_ENABLE]
         F2[FEATURE_HDR_TONEMAP]
-        F3[FEATURE_MTK_HDR_PATH]
+        F3[FEATURE_SOC_HDR_PATH]
     end
 
     subgraph CodeLayer["💻 Code 层 — 最终产物"]
@@ -563,7 +563,7 @@ flowchart TB
 **隔离效果**：
 - XML 中未声明 `FEATURE_HDR_ENABLE` 时，应用层查询返回 false，HDR 逻辑不启用
 - `#ifdef FEATURE_HDR_ENABLE` 为 false 时，HDR 相关代码不参与编译
-- `FEATURE_MTK_HDR_PATH=true` 时，走 MTK 特有的数据路径实现
+- `FEATURE_SOC_HDR_PATH=true` 时，走 SOC 特有的数据路径实现
 - 不同机型通过不同 Feature 组合，构建出差异化的代码镜像和系统能力
 
 #### Spec 决定代码实现
@@ -635,7 +635,7 @@ status_t DisplayHal::setHdrMode(HdrMode mode) {
 |----------|------|------------------------|------|
 | **功能代码** | 实现业务功能的源代码 | **Feature 隔离路径**，**Spec 决定实现** | `#ifdef FEATURE_HDR_ENABLE` 包裹的 HDR 处理逻辑（由 Spec 3.2.1 定义） |
 | **测试用例代码** | 验证功能正确性的单元/集成测试代码 | 基于 Feature 边界条件 + Spec 验收标准生成 | 针对 `FEATURE_HDR_TONEMAP` 三个取值的参数化测试（验证 Spec 3.2.2） |
-| **测试脚本** | 自动化测试的执行脚本 | 根据 Feature 作用域和 Spec 场景生成 | 针对 MTK/RTK/AML 平台分别生成的 HDMI 兼容性测试脚本 |
+| **测试脚本** | 自动化测试的执行脚本 | 根据 Feature 作用域和 Spec 场景生成 | 针对 SOC1/SOC2/SOC3 平台分别生成的 HDMI 兼容性测试脚本 |
 
 #### Code → Feature/Spec 反馈闭环
 
@@ -929,7 +929,7 @@ sequenceDiagram
 
 ### 3.1 场景描述
 
-**业务背景**：为某 MTK 平台 Android 14 机型新增 HDR 显示功能，涉及多个 Feature 的配置管理。
+**业务背景**：为某 SOC 平台 Android 14 机型新增 HDR 显示功能，涉及多个 Feature 的配置管理。
 
 ### 3.2 输入 Spec
 
@@ -1026,10 +1026,10 @@ sequenceDiagram
         FeatSvc-->>SkillGen: 返回草案列表
 
         SkillGen->>KnowSvc: 查询平台规则
-        KnowSvc-->>SkillGen: MTK平台HDR需额外开启 FEATURE_MTK_HDR_PATH
+        KnowSvc-->>SkillGen: SOC平台HDR需额外开启 FEATURE_SOC_HDR_PATH
 
         SkillGen->>FeatSvc: 补充关联 Feature
-        FeatSvc->>FeatSvc: 生成 FEATURE_MTK_HDR_PATH
+        FeatSvc->>FeatSvc: 生成 FEATURE_SOC_HDR_PATH
         FeatSvc-->>SkillGen: 更新完成
         SkillGen-->>DE: 返回配置草案
 
@@ -1073,16 +1073,16 @@ features:
     type: bool
     defaultValue: false
     scopes:
-      - platform: MTK
+      - platform: SOC
         minAndroidVersion: "14"
     specBindings:
       - specId: "SPEC_2024_DISPLAY_001"
         type: primary
         section: "3.2.1"
     relations:
-      - targetFeature: FEATURE_MTK_HDR_PATH
+      - targetFeature: FEATURE_SOC_HDR_PATH
         type: dependency
-        description: "MTK平台需同时开启HDR数据路径"
+        description: "SOC平台需同时开启HDR数据路径"
 
   - key: FEATURE_HDR_TONEMAP
     name: "HDR Tone Mapping"
@@ -1103,12 +1103,12 @@ features:
         type: primary
         section: "3.2.3"
 
-  - key: FEATURE_MTK_HDR_PATH
-    name: "MTK HDR 数据路径"
+  - key: FEATURE_SOC_HDR_PATH
+    name: "SOC HDR 数据路径"
     type: bool
     defaultValue: false
     scopes:
-      - platform: MTK
+      - platform: SOC
     specBindings:
       - specId: "SPEC_2024_DISPLAY_001"
         type: supplementary
@@ -1199,10 +1199,10 @@ features:
 ```yaml
 # 从本次配置过程中提取并沉淀到 Knowledge 层
 knowledge:
-  - id: KNOW_MTK_HDR_001
+  - id: KNOW_SOC_HDR_001
     type: platform_rule
-    platform: MTK
-    description: "MTK平台启用HDR时必须同时开启FEATURE_MTK_HDR_PATH"
+    platform: SOC
+    description: "SOC平台启用HDR时必须同时开启FEATURE_SOC_HDR_PATH"
     source: "SPEC_2024_DISPLAY_001 配置过程"
     confidence: high
 
@@ -1696,7 +1696,7 @@ flowchart TB
 |------|----------|------|------|
 | **Spec → Knowledge** | 解析 `SPEC_2024_DV_001` 时发现 Dolby Vision 兼容要求 | 提取标准条款 → 规则化 → 置信度评估 | 生成 `KNOW_DV_STANDARD_001` |
 | **Knowledge → Spec** | 创建新的 HDMI 功能 Spec | 查询 Knowledge 中 HDMI 相关规则 → 注入到 Spec 设计章节 | 新 Spec 自动包含 HDCP/VSIF 要求 |
-| **多 Spec → Knowledge** | 3 个 MTK 项目的 Spec 都提到 HDR 路径要求 | 模式匹配 → 归纳共性 → 抽象为平台规则 | 生成 `KNOW_MTK_HDR_001` |
+| **多 Spec → Knowledge** | 3 个 SOC 项目的 Spec 都提到 HDR 路径要求 | 模式匹配 → 归纳共性 → 抽象为平台规则 | 生成 `KNOW_SOC_HDR_001` |
 
 **示例**：每次人工解决冲突后，系统询问："是否将规则 `FEATURE_A 与 FEATURE_B 互斥` 加入 Knowledge？"
 
@@ -1761,8 +1761,8 @@ flowchart LR
 | **Spec 删除** | 关联 Knowledge 标记为 `deprecated`（不级联删除，保留追溯） | Knowledge | Spec 下线 → Knowledge 仍可查询但标记已过期来源 |
 | **Feature 创建** | 查询 Knowledge → 自动注入关联规则 → 生成合规检查报告 | Spec / Knowledge | 新建 `FEATURE_DOLBY_VISION` → 自动注入依赖 `FEATURE_HDR_ENABLE` |
 | **Feature 修改** | 重新校验所有关联的 Knowledge 约束 → 生成影响报告 | Knowledge | `FEATURE_HDR_TONEMAP` 枚举变更 → 校验 Knowledge 中引用该枚举的规则 |
-| **Knowledge 新增** | 扫描全量 Feature → 检查是否有新增约束应追加 → 生成差异报告 | Feature | 新增 `KNOW_MTK_HDR_002` → 扫描发现 MTK 平台 HDR Feature 缺少对应配置 |
-| **Knowledge 置信度升级** | 关联约束进入"自动同步"白名单（`low`→`high` 时触发） | Feature | `KNOW_MTK_HDR_001` 置信度 `low→high` → 自动为未配置的 MTK 项目 Feature 追加约束 |
+| **Knowledge 新增** | 扫描全量 Feature → 检查是否有新增约束应追加 → 生成差异报告 | Feature | 新增 `KNOW_SOC_HDR_002` → 扫描发现 SOC 平台 HDR Feature 缺少对应配置 |
+| **Knowledge 置信度升级** | 关联约束进入"自动同步"白名单（`low`→`high` 时触发） | Feature | `KNOW_SOC_HDR_001` 置信度 `low→high` → 自动为未配置的 SOC 项目 Feature 追加约束 |
 | **冲突解决沉淀** | 将解决方案写入 Knowledge + 标记来源 | Knowledge | 人工解决 Feature A/B 互斥冲突 → 系统提示"是否沉淀为 Knowledge？" → 生成 `KNOW_MUTEX_NEW` |
 
 **版本化追溯原理**：
