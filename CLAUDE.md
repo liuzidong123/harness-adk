@@ -36,6 +36,7 @@
 | /agh-android-game | SnakeShot Android 游戏开发| skills/agh-android-game.md |
 | /agh-openspec | 通用制品版本管理（OpenSpec 协议）| skills/agh-openspec.md |
 | /log-analysis | 基于 Spec 关键字的 adb logcat 日志分析 | skills/log-analysis.md |
+| /test-verify | 基于 Feature/Spec 的 adb 设备端 TDD 黑盒+白盒测试验证 | skills/test-verify.md |
 
 ---
 
