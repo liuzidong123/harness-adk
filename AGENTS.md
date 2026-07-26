@@ -14,6 +14,7 @@
 | `/agh-android-game` | Shorthand for Android game feature dev |
 | `/agh-openspec` | 通用制品版本管理协议 → 各角色通过 OpenSpec 管理产出物版本、追溯和变更（specs/ + changes/ + drafts/ 工作流） |
 | `/openspec-init` | SnakeShot 游戏特性规格初始化（生成设计规格文档） |
+| `/log-analysis` | 基于 Spec 关键字的 adb logcat 日志分析 → SpecService 定位 Spec → 提取 TAG/类名/方法名 → logcat 过滤 → 根因诊断 |
 
 Sequence is strict: clarify → propose → apply → archive. No skipping.
 
